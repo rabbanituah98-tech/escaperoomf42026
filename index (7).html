@@ -1,0 +1,1703 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0f0d0a">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Arkib Sejarah">
+<title>Misi Arkib Sejarah · Escape Room Sejarah Tingkatan 4</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;800&family=Special+Elite&display=swap" rel="stylesheet">
+<!--
+  ================================================================
+  MISI ARKIB SEJARAH — Escape Room Sejarah Tingkatan 4 (Bab 1, Bab 3, Bab 8)
+  Cikgu Rabbani, SMKDUMA, JU Sejarah Negeri · CG R 2026
+
+  TETAPAN GURU: tampal URL Web App Google Apps Script anda pada
+  SHEET_URL di bawah (cari "CONFIG"). Biarkan kosong untuk mod
+  luar talian (markah disimpan dalam peranti sahaja).
+  ================================================================
+-->
+<style>
+:root{
+  --bg:#0f0d0a; --bg2:#1a1612; --panel:#211c16; --panel2:#2a231b;
+  --brass:#c9a227; --brass2:#ecd27a; --brass3:#8a6d16;
+  --paper:#f4ead3; --paper2:#e9dcbc; --ink:#2b2318; --ink2:#5c4c36;
+  --red:#b3372b; --green:#3e7d4f; --teal:#3d6b73; --cream:#efe6d2; --mute:#a99c84;
+  --g0:#3d6b73; --g1:#9a5b2c; --g2:#6d4c8a;
+  --serif:'Cinzel', 'Trajan Pro', Georgia, 'Times New Roman', serif;
+  --type:'Special Elite', 'Courier New', Courier, monospace;
+  --sans:-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;padding:0}
+body{
+  font-family:var(--sans); color:var(--cream); min-height:100vh; background:var(--bg);
+  background-image:
+    radial-gradient(ellipse 90% 60% at 50% -10%, rgba(201,162,39,.16), transparent 60%),
+    radial-gradient(ellipse 80% 50% at 50% 115%, rgba(61,107,115,.28), transparent 60%),
+    repeating-linear-gradient(0deg, rgba(255,255,255,.022) 0 1px, transparent 1px 46px),
+    repeating-linear-gradient(90deg, rgba(255,255,255,.022) 0 1px, transparent 1px 46px);
+  background-attachment:fixed;
+}
+button{font:inherit;cursor:pointer;border:0;color:inherit}
+.wrap{max-width:1040px;margin:0 auto;padding:18px 16px 60px}
+.screen{display:none;animation:fade .35s ease}
+.screen.on{display:block}
+@keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+
+/* ---------- buttons ---------- */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:46px;padding:10px 18px;border-radius:12px;font-weight:700;letter-spacing:.3px;transition:transform .12s, filter .15s, box-shadow .15s}
+.btn:active{transform:scale(.97)}
+.btn-brass{background:linear-gradient(180deg,var(--brass2),var(--brass) 55%,var(--brass3));color:#231a05;box-shadow:0 2px 0 #5d4a0e,0 8px 20px rgba(201,162,39,.25);text-shadow:0 1px 0 rgba(255,255,255,.35)}
+.btn-brass:hover{filter:brightness(1.07)}
+.btn-ghost{background:rgba(255,255,255,.06);border:1px solid rgba(236,210,122,.35);color:var(--brass2)}
+.btn-ghost:hover{background:rgba(236,210,122,.12)}
+.btn-ink{background:var(--ink);color:var(--paper)}
+.btn-line{background:transparent;border:1.5px solid var(--ink2);color:var(--ink)}
+.btn[disabled]{opacity:.45;pointer-events:none}
+.icon-btn{width:44px;height:44px;border-radius:12px;background:rgba(255,255,255,.06);border:1px solid rgba(236,210,122,.3);font-size:19px;display:inline-flex;align-items:center;justify-content:center}
+
+/* ---------- home ---------- */
+.topbar{display:flex;justify-content:flex-end;gap:8px}
+.hero{text-align:center;padding:14px 0 6px}
+.hero .stamp-sm{display:inline-block;font-family:var(--type);font-size:12px;letter-spacing:3px;color:var(--red);border:2px solid var(--red);padding:3px 10px;border-radius:4px;transform:rotate(-3deg);opacity:.9;background:rgba(179,55,43,.07)}
+.title{font-family:var(--serif);font-weight:800;font-size:clamp(34px,7.5vw,68px);line-height:1;margin:14px 0 6px;letter-spacing:2px;
+  background:linear-gradient(180deg,#fff3c4,var(--brass2) 35%,var(--brass) 65%,#7a5c10);-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 3px 10px rgba(201,162,39,.25))}
+.subtitle{font-family:var(--type);color:var(--mute);font-size:14px;letter-spacing:.5px}
+.ticker{margin:18px auto 0;max-width:760px;overflow:hidden;border-top:1px dashed rgba(236,210,122,.3);border-bottom:1px dashed rgba(236,210,122,.3);padding:8px 0;font-family:var(--type);color:var(--brass2);font-size:13px;white-space:nowrap}
+.ticker span{display:inline-block;padding-left:100%;animation:tick 26s linear infinite}
+@keyframes tick{to{transform:translateX(-100%)}}
+
+.agent{margin:22px auto 8px;max-width:760px;background:var(--paper);color:var(--ink);border-radius:14px;padding:16px 18px;position:relative;box-shadow:0 12px 30px rgba(0,0,0,.45);
+  background-image:repeating-linear-gradient(0deg, transparent 0 27px, rgba(92,76,54,.12) 27px 28px)}
+.agent h3{margin:0 0 10px;font-family:var(--type);font-size:15px;letter-spacing:2px;color:var(--ink2)}
+.agent .row{display:grid;grid-template-columns:1.4fr 1fr auto;gap:10px;align-items:end}
+.agent label{font-size:12px;font-weight:700;color:var(--ink2);display:block;margin-bottom:4px;letter-spacing:.5px}
+.agent input,.agent select{width:100%;min-height:46px;border-radius:10px;border:1.5px solid #bfae88;background:#fffaf0;padding:8px 12px;font-size:16px;color:var(--ink);font-family:var(--type)}
+.agent input:focus,.agent select:focus{outline:none;border-color:var(--brass3);box-shadow:0 0 0 3px rgba(201,162,39,.25)}
+.agent .saved{font-family:var(--type);font-size:13px;color:var(--green);margin-top:8px;min-height:18px}
+@media(max-width:620px){.agent .row{grid-template-columns:1fr 1fr}.agent .row .btn{grid-column:1/-1}}
+
+.sec-h{font-family:var(--serif);font-size:20px;letter-spacing:2px;color:var(--brass2);margin:28px 0 12px;display:flex;align-items:center;gap:12px}
+.sec-h::after{content:"";flex:1;height:1px;background:linear-gradient(90deg,rgba(236,210,122,.45),transparent)}
+.rooms{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:14px}
+.room-card{position:relative;text-align:left;background:linear-gradient(180deg,var(--panel2),var(--panel));border:1px solid rgba(236,210,122,.22);border-radius:16px;padding:16px 16px 14px;overflow:hidden;transition:transform .18s, box-shadow .18s, border-color .18s;min-height:190px;display:flex;flex-direction:column}
+.room-card::before{content:"";position:absolute;inset:0 0 auto 0;height:4px;background:linear-gradient(90deg,var(--brass3),var(--brass2),var(--brass3))}
+.room-card:hover{transform:translateY(-4px);box-shadow:0 14px 30px rgba(0,0,0,.5);border-color:rgba(236,210,122,.55)}
+.room-card .no{font-family:var(--type);font-size:12px;color:var(--brass);letter-spacing:2px}
+.room-card .ic{font-size:40px;position:absolute;right:14px;top:16px;filter:drop-shadow(0 4px 8px rgba(0,0,0,.5))}
+.room-card h4{font-family:var(--serif);font-size:19px;margin:6px 0 4px;padding-right:48px;color:#fff6dc;line-height:1.2}
+.room-card p{margin:0;color:var(--mute);font-size:13.5px;line-height:1.4;flex:1}
+.room-card .meta{display:flex;gap:6px;flex-wrap:wrap;margin-top:12px}
+.chip{font-size:12px;font-weight:700;padding:4px 9px;border-radius:999px;background:rgba(255,255,255,.07);color:var(--cream);border:1px solid rgba(255,255,255,.1)}
+.chip.gold{background:rgba(201,162,39,.16);border-color:rgba(236,210,122,.4);color:var(--brass2)}
+.chip.ok{background:rgba(62,125,79,.2);border-color:rgba(98,170,118,.45);color:#9fe0b0}
+.room-card.special{border-color:rgba(179,55,43,.5)}
+@media(max-width:620px){.room-card{min-height:0}.room-card p{margin-bottom:2px}}
+.room-card.special::before{background:linear-gradient(90deg,#6b1d16,var(--red),#6b1d16)}
+.topics{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:16px}
+.topic-card{position:relative;text-align:left;border-radius:20px;padding:20px 18px 18px;overflow:hidden;min-height:230px;display:flex;flex-direction:column;
+  background:radial-gradient(ellipse at 100% 0%,var(--a2),transparent 70%),linear-gradient(170deg,#2a231b,#17130f);border:1px solid rgba(255,255,255,.12);transition:transform .18s, box-shadow .18s}
+.topic-card::before{content:"";position:absolute;inset:0 0 auto 0;height:5px;background:linear-gradient(90deg,var(--a2),var(--a),var(--a2))}
+.topic-card:hover{transform:translateY(-5px);box-shadow:0 18px 40px rgba(0,0,0,.55)}
+.topic-card .big{position:absolute;right:-6px;top:6px;font-size:84px;opacity:.9;filter:drop-shadow(0 8px 14px rgba(0,0,0,.6));transform:rotate(8deg)}
+.topic-card .bab{display:inline-block;font-family:var(--type);font-size:12px;letter-spacing:3px;color:#1b1406;background:var(--a);padding:4px 10px;border-radius:6px;align-self:flex-start}
+.topic-card h4{font-family:var(--serif);font-size:22px;line-height:1.15;margin:12px 0 4px;padding-right:80px;color:#fff6dc}
+.topic-card .tm{font-family:var(--type);font-size:13px;color:var(--a);margin-bottom:8px}
+.topic-card p{margin:0;color:#b9ad95;font-size:13.5px;line-height:1.45;flex:1}
+.topic-card .meta{display:flex;gap:6px;flex-wrap:wrap;margin-top:14px}
+.tprog{height:6px;border-radius:9px;background:rgba(255,255,255,.1);margin-top:10px;overflow:hidden}
+.tprog i{display:block;height:100%;background:linear-gradient(90deg,var(--a2),var(--a))}
+.topic-head{position:relative;border-radius:20px;padding:20px 18px;margin:8px 0 4px;overflow:hidden;border:1px solid rgba(255,255,255,.12);
+  background:radial-gradient(ellipse at 100% 0%,var(--acc2),transparent 75%),linear-gradient(170deg,#2a231b,#17130f)}
+.topic-head .big{position:absolute;right:10px;top:10px;font-size:70px;opacity:.85}
+.topic-head .bab{font-family:var(--type);font-size:12px;letter-spacing:3px;color:#1b1406;background:var(--acc);padding:4px 10px;border-radius:6px}
+.topic-head h2{font-family:var(--serif);font-size:clamp(22px,4.5vw,30px);margin:12px 0 4px;padding-right:80px;color:#fff6dc;line-height:1.15}
+.topic-head .tm{font-family:var(--type);color:var(--acc);font-size:14px}
+.topic-head p{color:#b9ad95;font-size:14px;line-height:1.5;margin:8px 0 0;max-width:640px}
+#topic .room-card::before,#room .progress i{background:linear-gradient(90deg,var(--acc2,var(--brass3)),var(--acc,var(--brass2)),var(--acc2,var(--brass3)))}
+#topic .room-card .no{color:var(--acc,var(--brass))}
+#room .hud .rn b{color:var(--acc,var(--brass2))}
+.home-actions{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:26px}
+.credit{text-align:center;margin-top:28px;font-family:var(--type);font-size:12.5px;color:#7d715d;line-height:1.7}
+
+/* ---------- room ---------- */
+.hud{position:sticky;top:0;z-index:20;background:rgba(15,13,10,.88);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border-bottom:1px solid rgba(236,210,122,.2);margin:-18px -16px 16px;padding:10px 16px}
+.hud-in{max-width:1040px;margin:0 auto;display:flex;align-items:center;gap:10px}
+.hud .rn{flex:1;min-width:0}
+.hud .rn b{display:block;font-family:var(--serif);font-size:16px;color:var(--brass2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hud .rn small{font-family:var(--type);color:var(--mute);font-size:11.5px}
+.stat{text-align:center;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);border-radius:10px;padding:5px 10px;min-width:70px}
+.stat small{display:block;font-size:10px;letter-spacing:1.5px;color:var(--mute);font-weight:700}
+.stat b{font-family:var(--type);font-size:19px;color:#fff3cf}
+.stat.timer.danger{border-color:var(--red);background:rgba(179,55,43,.18);animation:pulse 1s infinite}
+.stat.timer.danger b{color:#ff9b8f}
+@keyframes pulse{50%{box-shadow:0 0 0 4px rgba(179,55,43,.25)}}
+.progress{height:6px;border-radius:9px;background:rgba(255,255,255,.08);overflow:hidden;margin-top:8px;max-width:1040px;margin-left:auto;margin-right:auto}
+.progress i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--brass3),var(--brass2));transition:width .5s}
+
+.story{font-family:var(--type);color:#d9ccb0;background:rgba(0,0,0,.25);border-left:3px solid var(--brass);padding:10px 14px;border-radius:0 10px 10px 0;font-size:14px;line-height:1.55;margin-bottom:16px}
+.objs{display:grid;grid-template-columns:repeat(auto-fill,minmax(148px,1fr));gap:12px}
+.obj{position:relative;background:linear-gradient(160deg,#3a2f22,#231d15 70%);border:1px solid rgba(236,210,122,.25);border-radius:16px;padding:16px 10px 12px;text-align:center;min-height:156px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;transition:transform .15s, box-shadow .2s, border-color .2s;box-shadow:inset 0 1px 0 rgba(255,255,255,.06),0 6px 16px rgba(0,0,0,.35)}
+.obj::before,.obj::after{content:"";position:absolute;width:7px;height:7px;border-radius:50%;background:radial-gradient(circle at 30% 30%,#f7e3a0,#7a5c10);top:8px;left:8px;box-shadow:calc(100% + 0px) 0 0 0 transparent}
+.obj::after{left:auto;right:8px}
+.obj:hover{transform:translateY(-3px);border-color:rgba(236,210,122,.6)}
+.obj .e{font-size:44px;line-height:1;filter:drop-shadow(0 6px 8px rgba(0,0,0,.55));transition:transform .3s}
+.obj:hover .e{transform:scale(1.08) rotate(-3deg)}
+.obj .l{font-family:var(--type);font-size:13.5px;color:#f1e3bf}
+.obj .lk{position:absolute;right:10px;bottom:10px;font-size:15px;opacity:.85}
+.obj .typ{font-size:10.5px;letter-spacing:1.2px;color:var(--mute);font-weight:700;text-transform:uppercase}
+.obj.done{border-color:rgba(98,170,118,.7);background:linear-gradient(160deg,#2c3b2a,#1b2419 70%);box-shadow:0 0 0 1px rgba(98,170,118,.3),0 0 24px rgba(98,170,118,.18)}
+.obj .letter{position:absolute;left:10px;bottom:9px;width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--serif);font-weight:800;color:#231a05;background:radial-gradient(circle at 35% 30%,#fff2b8,var(--brass) 60%,var(--brass3));box-shadow:0 2px 8px rgba(0,0,0,.5)}
+
+.door{margin-top:20px;border-radius:18px;padding:18px;background:linear-gradient(180deg,#2b2016,#18120c);border:2px solid rgba(236,210,122,.25);text-align:center;position:relative;overflow:hidden}
+.door.ready{border-color:var(--brass);box-shadow:0 0 0 4px rgba(201,162,39,.12),0 0 40px rgba(201,162,39,.2)}
+.door h3{margin:0;font-family:var(--serif);color:var(--brass2);letter-spacing:2px;font-size:20px}
+.door .clue{font-family:var(--type);color:#d9ccb0;font-size:14px;margin:8px auto 12px;max-width:640px;line-height:1.5}
+.slots{display:flex;gap:6px;justify-content:center;flex-wrap:wrap;margin:10px 0}
+.slot{width:42px;height:50px;border-radius:9px;border:2px dashed rgba(236,210,122,.45);display:flex;align-items:center;justify-content:center;font-family:var(--serif);font-weight:800;font-size:22px;color:#fff1c2;background:rgba(0,0,0,.25)}
+.slot.filled{border-style:solid;background:rgba(201,162,39,.18)}
+.slot.gap{border:0;background:transparent;width:14px}
+.tiles{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin:8px 0 12px}
+.tile{width:46px;height:50px;border-radius:10px;font-family:var(--serif);font-weight:800;font-size:22px;color:#231a05;background:linear-gradient(180deg,#fff2bd,var(--brass2) 50%,var(--brass));box-shadow:0 3px 0 var(--brass3),0 6px 12px rgba(0,0,0,.35)}
+.tile.used{opacity:.2;pointer-events:none}
+
+/* ---------- modal ---------- */
+.modal{position:fixed;inset:0;z-index:50;display:none;align-items:flex-end;justify-content:center;background:rgba(5,4,3,.72);backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px);padding:12px}
+.modal.on{display:flex}
+@media(min-width:700px){.modal{align-items:center}}
+.sheet{width:100%;max-width:640px;max-height:92vh;overflow:auto;background:var(--paper);color:var(--ink);border-radius:18px;box-shadow:0 30px 80px rgba(0,0,0,.6);position:relative;animation:up .3s cubic-bezier(.2,.9,.3,1.2);
+  background-image:radial-gradient(ellipse at 20% 0%,rgba(255,255,255,.6),transparent 50%),radial-gradient(ellipse at 100% 100%,rgba(160,120,60,.12),transparent 60%)}
+@keyframes up{from{transform:translateY(40px);opacity:0}to{transform:none;opacity:1}}
+.sheet-h{display:flex;align-items:center;gap:10px;padding:12px 16px;border-bottom:2px dashed rgba(92,76,54,.35);font-family:var(--type);font-size:12.5px;letter-spacing:2px;color:var(--ink2);position:sticky;top:0;background:var(--paper2);z-index:2}
+.sheet-h .x{margin-left:auto;width:38px;height:38px;border-radius:10px;background:rgba(0,0,0,.06);font-size:18px;color:var(--ink)}
+.sheet-b{padding:16px 18px 20px}
+.p-title{display:flex;align-items:center;gap:12px;margin-bottom:10px}
+.p-title .e{font-size:40px}
+.p-title b{font-family:var(--serif);font-size:20px;display:block;line-height:1.15}
+.p-title small{font-size:12px;color:var(--ink2);font-weight:700;letter-spacing:1px}
+.q{font-size:16.5px;line-height:1.55;margin:4px 0 14px;font-weight:500}
+.q strong{color:var(--red)}
+.worth{font-family:var(--type);font-size:12.5px;color:var(--ink2);display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;margin-bottom:10px}
+.opts{display:grid;gap:9px}
+.opt{text-align:left;background:#fffaf0;border:1.5px solid #cdbb93;border-radius:12px;padding:12px 14px;min-height:50px;font-size:15.5px;line-height:1.35;color:var(--ink);display:flex;gap:10px;align-items:flex-start;transition:background .12s,border-color .12s}
+.opt .k{flex:none;width:26px;height:26px;border-radius:50%;border:1.5px solid #a8936a;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px;color:var(--ink2)}
+.opt.sel{background:#2b2318;color:var(--paper);border-color:#2b2318}
+.opt.sel .k{border-color:var(--brass2);color:var(--brass2)}
+.opt.bad{background:#f6d6cf;border-color:var(--red);color:#5b1a12}
+.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}
+.actions .btn{flex:1;min-width:140px}
+.hintbox{margin-top:12px;background:#fff4cf;border:1.5px dashed var(--brass3);border-radius:12px;padding:10px 12px;font-size:14.5px;display:none}
+.hintbox.on{display:block;animation:fade .3s}
+.fb{min-height:22px;margin-top:10px;font-weight:700;font-size:14.5px}
+.fb.bad{color:var(--red)} .fb.ok{color:var(--green)}
+.shake{animation:shake .4s}
+@keyframes shake{20%{transform:translateX(-8px)}40%{transform:translateX(8px)}60%{transform:translateX(-5px)}80%{transform:translateX(5px)}}
+
+/* code dial */
+.dials{display:flex;gap:10px;justify-content:center;margin:8px 0}
+.dial{display:flex;flex-direction:column;align-items:center;gap:6px}
+.dial button{width:56px;height:38px;border-radius:10px;background:#2b2318;color:var(--brass2);font-size:16px}
+.dial .d{width:56px;height:70px;border-radius:12px;background:linear-gradient(180deg,#1a140d,#3a2d1d 50%,#1a140d);color:#fff0bf;font-family:var(--type);font-size:38px;display:flex;align-items:center;justify-content:center;box-shadow:inset 0 3px 8px rgba(0,0,0,.7),0 2px 0 #c9a227}
+/* paper letter tiles */
+.sheet .slot{border-color:#a8936a;color:var(--ink);background:#fffaf0}
+.sheet .slot.filled{background:#f3dc8f;border-color:var(--brass3)}
+/* classify */
+.cls{display:grid;gap:10px}
+.cls-item{background:#fffaf0;border:1.5px solid #cdbb93;border-radius:12px;padding:10px 12px}
+.cls-item.bad{border-color:var(--red);background:#fbe6e1}
+.cls-item .t{font-size:15px;line-height:1.4;margin-bottom:8px;font-weight:600}
+.seg{display:flex;gap:6px;flex-wrap:wrap}
+.seg button{flex:1;min-width:84px;min-height:40px;border-radius:9px;border:1.5px solid #bba97f;background:transparent;font-size:13px;font-weight:700;color:var(--ink2);padding:6px 8px}
+.seg button.on{color:#fff;border-color:transparent}
+.seg button.on.g0{background:var(--g0)} .seg button.on.g1{background:var(--g1)} .seg button.on.g2{background:var(--g2)}
+/* order */
+.ord-list{display:grid;gap:8px;margin-bottom:12px;counter-reset:o}
+.ord-slot{min-height:50px;border-radius:12px;border:1.5px dashed #a8936a;display:flex;align-items:center;gap:10px;padding:8px 12px;font-size:14.5px;text-align:left;background:rgba(255,255,255,.35);color:var(--ink);width:100%}
+.ord-slot .n{flex:none;width:28px;height:28px;border-radius:50%;background:var(--ink);color:var(--brass2);display:flex;align-items:center;justify-content:center;font-family:var(--type);font-size:14px}
+.ord-slot.filled{border-style:solid;background:#fffaf0}
+.ord-slot.bad{border-color:var(--red);background:#fbe6e1}
+.ord-slot.good{border-color:var(--green);background:#e3f1e5}
+.pool{display:grid;gap:8px}
+.pool button{text-align:left;background:#2b2318;color:var(--paper);border-radius:12px;padding:10px 12px;font-size:14.5px;min-height:46px;line-height:1.35}
+.pool button.used{display:none}
+.lbl{font-size:12px;font-weight:800;letter-spacing:1.5px;color:var(--ink2);margin:8px 0 6px}
+/* match */
+.mt{display:grid;gap:10px}
+.mt-row{display:grid;grid-template-columns:120px 1fr;gap:10px;align-items:center;background:#fffaf0;border:1.5px solid #cdbb93;border-radius:12px;padding:8px 10px}
+.mt-row.bad{border-color:var(--red);background:#fbe6e1}
+.mt-row b{font-family:var(--type);font-size:14px;color:var(--ink)}
+.mt-row select{width:100%;min-height:44px;border-radius:9px;border:1.5px solid #bba97f;background:#fff;font-size:14px;padding:6px 8px;color:var(--ink)}
+@media(max-width:520px){.mt-row{grid-template-columns:1fr}}
+/* fill */
+.fill-s{font-size:17px;line-height:2.2;background:#fffaf0;border:1.5px solid #cdbb93;border-radius:12px;padding:10px 14px;margin-bottom:12px}
+.blank{display:inline-flex;min-width:120px;min-height:38px;align-items:center;justify-content:center;border-bottom:2.5px solid var(--ink);margin:0 4px;padding:0 10px;font-weight:800;color:var(--teal);vertical-align:middle;background:rgba(201,162,39,.1);border-radius:6px 6px 0 0}
+.blank.bad{border-color:var(--red);color:var(--red)}
+.bank{display:flex;flex-wrap:wrap;gap:8px}
+.bank button{background:#2b2318;color:var(--paper);border-radius:999px;padding:9px 16px;min-height:42px;font-weight:700}
+.bank button.used{opacity:.25;pointer-events:none}
+
+/* success */
+.success{text-align:center;padding:6px 0 4px;position:relative}
+.big-stamp{display:inline-block;font-family:var(--serif);font-weight:800;font-size:34px;letter-spacing:6px;color:var(--green);border:4px double var(--green);padding:6px 18px;border-radius:8px;transform:rotate(-8deg);animation:stamp .45s cubic-bezier(.2,1.6,.4,1)}
+.big-stamp.red{color:var(--red);border-color:var(--red)}
+@keyframes stamp{from{transform:scale(2.4) rotate(-8deg);opacity:0}to{transform:scale(1) rotate(-8deg);opacity:1}}
+.gain{font-family:var(--type);font-size:20px;margin:14px 0 4px}
+.reveal{display:flex;align-items:center;justify-content:center;gap:10px;margin:10px 0;font-weight:700}
+.reveal .letter{width:52px;height:52px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--serif);font-weight:800;font-size:26px;color:#231a05;background:radial-gradient(circle at 35% 30%,#fff2b8,var(--brass) 60%,var(--brass3));box-shadow:0 4px 14px rgba(0,0,0,.35);animation:spin .7s ease}
+@keyframes spin{from{transform:rotateY(180deg) scale(.4)}to{transform:none}}
+.fact{text-align:left;background:#e9f2ea;border-left:4px solid var(--green);padding:10px 12px;border-radius:0 10px 10px 0;font-size:14.5px;line-height:1.5;margin-top:10px}
+.fact b{display:block;font-size:11.5px;letter-spacing:1.5px;color:var(--green);margin-bottom:2px}
+
+/* end */
+.end{max-width:640px;margin:20px auto;text-align:center}
+.end .card{background:var(--paper);color:var(--ink);border-radius:18px;padding:22px 18px;box-shadow:0 20px 60px rgba(0,0,0,.5);margin-top:16px}
+.stars{font-size:44px;letter-spacing:6px;margin:10px 0}
+.stars .off{filter:grayscale(1);opacity:.25}
+.brk{display:grid;gap:6px;text-align:left;font-family:var(--type);font-size:15px;margin:14px 0}
+.brk div{display:flex;justify-content:space-between;border-bottom:1px dashed #bba97f;padding:5px 2px}
+.brk .tot{font-size:20px;border-bottom:0;color:var(--ink);font-weight:700}
+.sendst{font-size:13.5px;font-weight:700;margin-top:6px;min-height:20px}
+
+/* board */
+.board-top{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:14px}
+.tabs{display:flex;background:rgba(255,255,255,.06);border-radius:12px;padding:4px;border:1px solid rgba(236,210,122,.2)}
+.tabs button{padding:9px 14px;border-radius:9px;font-weight:700;color:var(--mute);min-height:40px}
+.tabs button.on{background:var(--brass);color:#231a05}
+.board-top select{max-width:100%;text-overflow:ellipsis;min-height:44px;border-radius:10px;background:var(--panel2);color:var(--cream);border:1px solid rgba(236,210,122,.3);padding:6px 10px;font-size:14px}
+.lb{display:grid;gap:8px}
+.lb-row{display:grid;grid-template-columns:46px 1fr auto;gap:10px;align-items:center;background:linear-gradient(90deg,var(--panel2),var(--panel));border:1px solid rgba(255,255,255,.07);border-radius:12px;padding:10px 12px;animation:fade .3s both}
+.lb-row .rk{font-family:var(--serif);font-weight:800;font-size:20px;text-align:center;color:var(--mute)}
+.lb-row.r1{border-color:rgba(236,210,122,.6);background:linear-gradient(90deg,rgba(201,162,39,.22),var(--panel))}
+.lb-row.r2{border-color:rgba(200,200,210,.4)} .lb-row.r3{border-color:rgba(190,120,60,.45)}
+.lb-row .nm{font-weight:700;color:#fff3d6;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.lb-row .sb{font-size:12.5px;color:var(--mute)}
+.lb-row .sc{font-family:var(--type);font-size:20px;color:var(--brass2);text-align:right}
+.lb-row .sc small{display:block;font-size:11px;color:var(--mute);font-family:var(--sans)}
+.bar{height:5px;border-radius:9px;background:rgba(255,255,255,.08);margin-top:6px;overflow:hidden}
+.bar i{display:block;height:100%;background:linear-gradient(90deg,var(--teal),var(--brass2))}
+.note{font-size:13px;color:var(--mute);background:rgba(255,255,255,.04);border:1px dashed rgba(236,210,122,.3);border-radius:10px;padding:10px 12px;margin-bottom:12px;line-height:1.5}
+.empty{text-align:center;color:var(--mute);padding:40px 10px;font-family:var(--type)}
+
+.toast{pointer-events:none;position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(30px);background:#2b2318;color:var(--paper);padding:11px 18px;border-radius:12px;font-weight:700;font-size:14px;z-index:90;opacity:0;transition:.25s;border:1px solid var(--brass3);max-width:90vw;text-align:center}
+.toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
+#confetti{position:fixed;inset:0;pointer-events:none;z-index:80}
+.howto ol{padding-left:20px;line-height:1.6;font-size:15px}
+.howto li{margin-bottom:6px}
+.score-table{width:100%;border-collapse:collapse;font-size:14px;margin-top:6px}
+.score-table td{padding:6px 4px;border-bottom:1px dashed #cdbb93}
+.score-table td:last-child{text-align:right;font-family:var(--type);font-weight:700}
+</style>
+</head>
+<body>
+
+<!-- ================= HOME ================= -->
+<section id="home" class="screen on"><div class="wrap">
+  <div class="topbar">
+    <button class="icon-btn" id="muteBtn" title="Bunyi">🔊</button>
+  </div>
+  <div class="hero">
+    <span class="stamp-sm">SULIT · ESCAPE ROOM</span>
+    <h1 class="title">MISI ARKIB SEJARAH</h1>
+    <div class="subtitle">Escape Room Sejarah Tingkatan 4 · Pilih topik, masuk bilik, pecahkan kunci!</div>
+    <div class="ticker"><span>TELEGRAM SULIT ··· ARKIB SEJARAH TELAH DIKUNCI STOP ··· PILIH TOPIK DAN BILIK STOP ··· PECAHKAN SETIAP KUNCI STOP ··· KUMPUL HURUF RAHSIA STOP ··· BUKA PINTU SEBELUM MASA TAMAT STOP ··· SEMOGA BERJAYA EJEN ···</span></div>
+  </div>
+
+  <div class="agent">
+    <h3>🪪 KAD PENGENALAN EJEN</h3>
+    <div class="row">
+      <div><label for="pNama">NAMA</label><input id="pNama" maxlength="40" placeholder="cth: Aiman Hakimi" autocomplete="off"></div>
+      <div><label for="pKelas">KELAS</label><span id="kelasWrap"><input id="pKelas" maxlength="20" placeholder="cth: 4 Bestari" autocomplete="off"></span></div>
+      <button class="btn btn-ink" id="saveAgent">Simpan</button>
+    </div>
+    <div class="saved" id="agentSaved"></div>
+  </div>
+
+  <div class="sec-h">PILIH TOPIK MISI</div>
+  <div class="topics" id="topicGrid"></div>
+
+  <div class="home-actions">
+    <button class="btn btn-brass" id="toBoard">🏆 Papan Markah Kelas</button>
+    <button class="btn btn-ghost" id="toHow">📖 Cara Bermain</button>
+  </div>
+  <div class="credit">Disediakan oleh Cikgu Rabbani, SMKDUMA, JU Sejarah Negeri · CG R 2026<br>Kandungan berdasarkan nota "Key Point" Bab 1, Bab 3 &amp; Bab 8</div>
+</div></section>
+
+<!-- ================= TOPIK ================= -->
+<section id="topic" class="screen"><div class="wrap">
+  <div class="topbar" style="justify-content:space-between">
+    <button class="icon-btn" id="topicBack" title="Kembali">⟵</button>
+    <button class="btn btn-ghost" id="topicBoard" style="min-height:44px">🏆 Papan Markah</button>
+  </div>
+  <div class="topic-head" id="topicHead"></div>
+  <div class="sec-h">PILIH BILIK</div>
+  <div class="rooms" id="roomGrid"></div>
+</div></section>
+
+<!-- ================= ROOM ================= -->
+<section id="room" class="screen"><div class="wrap">
+  <div class="hud"><div class="hud-in">
+    <button class="icon-btn" id="exitRoom" title="Keluar">⟵</button>
+    <div class="rn"><b id="hudName">Bilik</b><small id="hudSub"></small></div>
+    <div class="stat timer" id="timerBox"><small>MASA</small><b id="hudTime">00:00</b></div>
+    <div class="stat"><small>MARKAH</small><b id="hudScore">0</b></div>
+  </div>
+  <div class="progress"><i id="hudProg"></i></div></div>
+  <div class="story" id="roomStory"></div>
+  <div class="objs" id="objGrid"></div>
+  <div class="door" id="door"></div>
+</div></section>
+
+<!-- ================= END ================= -->
+<section id="end" class="screen"><div class="wrap"><div class="end" id="endBox"></div></div></section>
+
+<!-- ================= BOARD ================= -->
+<section id="board" class="screen"><div class="wrap">
+  <div class="board-top">
+    <button class="icon-btn" id="boardBack">⟵</button>
+    <h2 style="margin:0;font-family:var(--serif);color:var(--brass2);letter-spacing:2px;flex:1;font-size:22px">🏆 PAPAN MARKAH</h2>
+    <button class="icon-btn" id="boardRefresh" title="Muat semula">⟳</button>
+  </div>
+  <div class="board-top">
+    <div class="tabs" id="boardTabs"><button data-t="kelas" class="on">Kelas</button><button data-t="individu">Individu</button></div>
+    <select id="boardTopic"></select>
+    <select id="boardRoom"></select>
+    <select id="boardSort"><option value="jumlah">Susun: Jumlah</option><option value="purata">Susun: Purata</option></select>
+  </div>
+  <div id="boardNote"></div>
+  <div class="lb" id="lb"></div>
+</div></section>
+
+<!-- ================= MODALS ================= -->
+<div class="modal" id="mPuzzle"><div class="sheet" id="pzSheet"></div></div>
+<div class="modal" id="mInfo"><div class="sheet" id="infoSheet"></div></div>
+<div class="toast" id="toast"></div>
+<canvas id="confetti"></canvas>
+
+<script>
+/* =====================================================================
+   CONFIG — TETAPAN GURU
+   SHEET_URL     : URL Web App Google Apps Script (berakhir dengan /exec)
+   SENARAI_KELAS : isi jika mahu murid PILIH kelas daripada senarai,
+                   cth: ["4 Amanah","4 Bestari","4 Cemerlang"]. Biar [] untuk taip bebas.
+   ===================================================================== */
+const CONFIG = {
+  SHEET_URL: "",
+  GAME_ID: "SEJ-T4",
+  SENARAI_KELAS: []
+};
+
+/* ======================= KANDUNGAN — diambil daripada PDF "Key Point" sahaja ======================= */
+const TOPICS = [
+/* ============================== BAB 1 ============================== */
+{ id:"b1", no:"BAB 1", nama:"Warisan Negara Bangsa", tema:"Misi Istana Melaka", ic:"👑", acc:"#c98a2b", acc2:"#7a1f2b",
+  desc:"Ciri-ciri negara bangsa, Kesultanan Melayu Melaka, sistem pentadbiran, undang-undang serta peranan pemerintah dan rakyat.",
+  mix:{ word:"MELAKA", clue:"Kesultanan Melayu ini mewarisi dan menyerapkan ciri-ciri negara bangsa kerajaan Alam Melayu yang terdahulu." },
+  rooms:[
+  { ic:"🏺", nama:"Balai Kerajaan Purba", sub:"1.1 Ciri-ciri Negara Bangsa Kerajaan Alam Melayu",
+    story:"Anda tersesat di sebuah balai kerajaan purba Alam Melayu. Pintu-pintunya dikunci dengan rahsia Funan, Champa, Srivijaya dan Majapahit. Buka setiap kunci untuk keluar!",
+    word:"CHAMPA", clue:"Raja kerajaan ini dianggap sebagai pemerintah yang suci dan dikaitkan dengan Dewa Siva.",
+    puzzles:[
+      {e:"🔗", l:"Papan Ciri", type:"match", icon:"🏷️", q:"Padankan setiap ciri negara bangsa dengan contohnya.",
+       pairs:[["Raja","Raja Champa dianggap suci, dikaitkan dengan Dewa Siva"],["Undang-undang","Majapahit mengamalkan Kutara Manawa"],["Wilayah pengaruh","Kawasan Funan yang rakyatnya memperakui pemerintahan raja"],["Rakyat","Rakyat Srivijaya meminum air sumpah"]],
+       hint:"Air sumpah berkaitan dengan kesetiaan rakyat.",
+       fact:"Ciri-ciri negara bangsa kerajaan Alam Melayu: raja, undang-undang, wilayah pengaruh dan rakyat."},
+      {e:"📜", l:"Prasasti Majapahit", type:"mcq", q:"Undang-undang yang diamalkan oleh kerajaan Majapahit ialah…",
+       opts:["Kutara Manawa","Hukum Kanun Melaka","Undang-Undang Laut Melaka","Enakmen Undang-Undang Islam 1904"], ans:0,
+       hint:"Undang-undang ini bukan daripada zaman Melaka.",
+       fact:"Undang-undang memastikan kesejahteraan kerajaan, terpakai di seluruh wilayah pengaruh dan menjadi panduan pentadbiran. Contohnya, Majapahit mengamalkan Kutara Manawa."},
+      {e:"🏺", l:"Tempayan Sumpah", type:"scramble", ans:"SRIVIJAYA",
+       q:"Susun huruf! Rakyat kerajaan ini membuktikan kesetiaan kepada raja dengan upacara persetiaan dan meminum air sumpah.",
+       hint:"Kerajaan ini berpusat di Palembang.",
+       fact:"Rakyat ialah penduduk yang setia kepada raja dan tidak menderhaka. Contohnya, rakyat Srivijaya meminum air sumpah."},
+      {e:"🧭", l:"Peta Funan", type:"multi", q:"Pilih <b>TIGA</b> kawasan dalam wilayah pengaruh kerajaan Funan.",
+       opts:["Sungai Mekong","Teluk Cam Ranh","Segenting Kra","Palembang","Pantai timur Sumatera","Kota Bharu"], ans:[0,1,2],
+       hint:"Funan terletak di tanah besar Asia Tenggara, bukan di Sumatera.",
+       fact:"Wilayah pengaruh Funan meliputi Sungai Mekong, Teluk Cam Ranh, selatan Myanmar dan Segenting Kra."},
+      {e:"⏳", l:"Jam Pasir Zaman", type:"order", q:"Susun sejarah ciri-ciri negara bangsa mengikut urutan yang betul.",
+       items:["Diasaskan oleh kerajaan Alam Melayu, iaitu Funan dan Champa","Diteruskan oleh kerajaan Srivijaya yang berpusat di Palembang","Diwarisi oleh Kesultanan Melayu Melaka","Diteruskan oleh Kesultanan Johor-Riau"],
+       hint:"Kesultanan Johor-Riau berada di hujung urutan.",
+       fact:"Funan & Champa → Srivijaya → Kesultanan Melayu Melaka → Kesultanan Johor-Riau."},
+      {e:"🕌", l:"Kitab Johor-Riau", type:"mcq", q:"Kesultanan Johor-Riau meneruskan ciri-ciri negara bangsa dengan menekankan…",
+       opts:["kepentingan Islam","kuasa tentera laut","hubungan dengan China","sistem pilihan raya"], ans:0,
+       hint:"Berkaitan dengan agama.",
+       fact:"Kesultanan Johor-Riau meneruskan ciri-ciri negara bangsa dengan menekankan kepentingan Islam."}
+    ]},
+  { ic:"👑", nama:"Balairung Seri Melaka", sub:"1.2 Ciri-ciri Negara Bangsa Kesultanan Melayu Melaka",
+    story:"Anda terkunci di Balairung Seri istana Melaka. Lambang kebesaran diraja disimpan di sebalik kunci-kunci rahsia. Buktikan anda memahami kedaulatan Melaka untuk keluar!",
+    word:"SULTAN", clue:"Gelaran yang mula digunakan oleh pemerintah Kesultanan Melayu Melaka selepas kedatangan Islam.",
+    puzzles:[
+      {e:"🏯", l:"Tiang Seri", type:"mcq", q:"Sistem yang memperkukuhkan pemerintahan beraja dan menjadi tonggak pentadbiran Melaka ialah…",
+       opts:["Sistem Pembesar Empat Lipatan","Sistem Ahli","Sistem serah","Sistem kerah"], ans:0,
+       hint:"Sistem ini melibatkan pembesar mengikut lapisan.",
+       fact:"Sistem Pembesar Empat Lipatan memperkukuhkan pemerintahan beraja dan menjadi tonggak pentadbiran Melaka."},
+      {e:"🔺", l:"Piramid Sosial", type:"classify", q:"Kelaskan golongan dalam hierarki sosial Kesultanan Melayu Melaka.",
+       groups:["Pemerintah","Diperintah"],
+       items:[["Sultan",0],["Pembesar",0],["Golongan merdeka",1],["Hamba",1]],
+       hint:"Golongan pemerintah berada di puncak piramid.",
+       fact:"Sultan dan pembesar ialah golongan pemerintah; golongan merdeka dan hamba ialah golongan diperintah. Hubungan timbal balik mewujudkan persefahaman antara kedua-duanya."},
+      {e:"🐉", l:"Warkah China", type:"scramble", ans:"MING",
+       q:"Susun huruf! Kedaulatan Melaka diiktiraf oleh kerajaan Dinasti ini melalui penghantaran beberapa orang utusan.",
+       hint:"Dinasti di China.",
+       fact:"Kedaulatan Melaka diiktiraf oleh kerajaan Dinasti Ming melalui penghantaran utusan."},
+      {e:"⛵", l:"Kapal Utusan", type:"mcq", q:"Siapakah yang mengetuai utusan Dinasti Ming untuk mengeratkan hubungan antara China dengan Melaka?",
+       opts:["Laksamana Cheng Ho","Nakhoda Jenal","Nakhoda Sahak","Sultan Mahmud Shah"], ans:0,
+       hint:"Beliau bergelar Laksamana.",
+       fact:"Utusan Dinasti Ming yang diketuai Laksamana Cheng Ho mengeratkan hubungan China dengan Melaka."},
+      {e:"🗺️", l:"Peta Empayar", type:"multi", q:"Pilih <b>TIGA</b> cara Melaka memperoleh wilayah pengaruh yang luas.",
+       opts:["Penaklukan","Naungan","Perkahwinan","Pembelian tanah","Pilihan raya","Pertukaran wilayah"], ans:[0,1,2],
+       hint:"Salah satunya melibatkan ikatan keluarga diraja.",
+       fact:"Wilayah pengaruh Melaka merangkumi Semenanjung Tanah Melayu dan pantai timur Sumatera, diperoleh melalui penaklukan, naungan dan perkahwinan."},
+      {e:"🔏", l:"Cap Diraja", type:"mcq", q:"Lambang kebesaran yang digunakan untuk <b>mengesahkan arahan</b> daripada sultan ialah…",
+       opts:["Cap mohor","Nobat","Regalia","Penggunaan warna"], ans:0,
+       hint:"Ia dicap pada surat atau warkah.",
+       fact:"Lambang kebesaran (adat istiadat, penggunaan warna, nobat, regalia dan cap mohor) menjadi simbol kedaulatan sultan. Cap mohor mengesahkan arahan sultan."}
+    ]},
+  { ic:"🏯", nama:"Dewan Pembesar", sub:"1.3 Sistem Pentadbiran Kesultanan Melayu Melaka",
+    story:"Anda terperangkap dalam dewan mesyuarat para pembesar Melaka. Setiap pembesar menyimpan satu kunci. Kenali tugas mereka untuk meloloskan diri!",
+    word:"ISTANA", clue:"Hasil perbendaharaan digunakan untuk kepentingan kerajaan seperti membeli senjata dan membina ______.",
+    puzzles:[
+      {e:"🎖️", l:"Lencana Pembesar", type:"match", icon:"🎖️", q:"Padankan pembesar dengan tugasnya.",
+       pairs:[["Bendahara","Ketua pentadbir dan pemangku sultan"],["Penghulu Bendahari","Menguruskan perbendaharaan secara teratur"],["Temenggung","Menjaga keselamatan kota Melaka"],["Laksamana","Panglima angkatan laut Melaka"],["Syahbandar","Mengutip cukai di pelabuhan"]],
+       hint:"Laksamana berkaitan dengan laut; Syahbandar berkaitan dengan pelabuhan.",
+       fact:"Bendahara: ketua pentadbir, ketua turus angkatan tentera, penasihat dan pemangku sultan. Penghulu Bendahari: perbendaharaan. Temenggung: keselamatan kota. Laksamana: panglima angkatan laut. Syahbandar: cukai pelabuhan."},
+      {e:"👥", l:"Meja Empat", type:"multi", q:"Pilih <b>EMPAT</b> pembesar yang menganggotai Pembesar Berempat.",
+       opts:["Bendahara","Penghulu Bendahari","Temenggung","Laksamana","Syahbandar","Orang Kaya"], ans:[0,1,2,3],
+       hint:"Syahbandar dan Orang Kaya ialah pembesar lain yang membantu pentadbiran.",
+       fact:"Pembesar Berempat: Bendahara, Penghulu Bendahari, Temenggung dan Laksamana. Pembesar lain termasuk Syahbandar, Bentara, Orang Kaya, hulubalang dan penghulu."},
+      {e:"🏝️", l:"Gulungan Kurnia", type:"mcq", q:"Wilayah, sungai atau pulau yang diberikan sultan kepada Pembesar Berempat untuk diperintah dikenali sebagai…",
+       opts:["Kawasan pegangan","Wilayah pengaruh","Kawasan pilihan raya","Wilayah naungan"], ans:0,
+       hint:"Pembesar 'memegang' kawasan ini.",
+       fact:"Kawasan yang diberikan sultan kepada Pembesar Berempat dikenali sebagai kawasan pegangan."},
+      {e:"🗃️", l:"Kabinet Pentadbiran", type:"classify", q:"Kelaskan ciri-ciri mengikut peringkat pentadbiran Kesultanan Melayu Melaka.",
+       groups:["Peringkat pusat","Peringkat jajahan"],
+       items:[["Dilaksanakan oleh Pembesar Berempat",0],["Permuafakatan antara sultan dengan pembesar",0],["Sistem kewangan yang teratur",0],["Sistem keselamatan yang kemas di darat dan di laut",0],["Menguruskan pentadbiran di daerah dan kampung",1],["Menjaga keamanan kawasan dan dibenarkan mengutip cukai",1]],
+       hint:"Peringkat jajahan melibatkan daerah dan kampung.",
+       fact:"Pentadbiran peringkat pusat dilaksanakan oleh Pembesar Berempat; pentadbiran peringkat jajahan diuruskan oleh pembesar yang dilantik di daerah dan kampung."},
+      {e:"🤝", l:"Ikatan Muafakat", type:"mcq", q:"Permuafakatan antara sultan dengan pembesar di peringkat pusat dapat…",
+       opts:["mewujudkan pentadbiran yang sempurna dan mengelakkan tindakan sewenang-wenangnya oleh pemerintah","memansuhkan kuasa sultan dalam hal ehwal agama","menyerahkan kuasa pentadbiran kepada kuasa asing","menghapuskan sistem kawasan pegangan"], ans:0,
+       hint:"Muafakat membawa kesempurnaan.",
+       fact:"Permuafakatan sultan dengan pembesar mewujudkan pentadbiran yang sempurna dan mengelakkan tindakan sewenang-wenangnya oleh pemerintah."},
+      {e:"💰", l:"Peti Perbendaharaan", type:"multi", q:"Pilih <b>TIGA</b> sumber pendapatan Kesultanan Melayu Melaka.",
+       opts:["Urusan perdagangan","Cukai","Ufti daripada wilayah taklukan","Pampasan perang","Wang pokok pisang","Hasil minyak Miri"], ans:[0,1,2],
+       hint:"Melaka ialah pelabuhan perdagangan dan mempunyai wilayah taklukan.",
+       fact:"Pendapatan Melaka diperoleh daripada urusan perdagangan, cukai dan ufti daripada wilayah taklukan serta naungan."}
+    ]},
+  { ic:"⚖️", nama:"Bilik Kanun", sub:"1.3 Undang-undang Kesultanan Melayu Melaka",
+    story:"Anda terkurung dalam bilik penyimpanan kitab undang-undang Melaka. Kitab Hukum Kanun Melaka dan Undang-Undang Laut Melaka berkunci. Buka fasal demi fasal untuk keluar!",
+    word:"NAKHODA", clue:"Undang-Undang Laut Melaka diusahakan oleh beberapa ______ Melaka seperti Jenal, Diri dan Sahak.",
+    puzzles:[
+      {e:"📕", l:"Kitab Kanun", type:"code", ans:"44",
+       q:"Kitab ini berkunci 2 digit. Kodnya ialah <b>bilangan fasal</b> dalam Hukum Kanun Melaka.",
+       hint:"Dua digit yang sama.",
+       fact:"Hukum Kanun Melaka mengandungi 44 fasal. Kedua-dua undang-undang Melaka berasaskan syariah dan hukum adat."},
+      {e:"🔗", l:"Indeks Fasal", type:"match", icon:"📜", q:"Padankan fasal Hukum Kanun Melaka dengan kandungannya.",
+       pairs:[["Fasal 1","Tugas sultan, Bendahara, Temenggung dan Penghulu Bendahari"],["Fasal 4","Hukuman bunuh bagi yang ingkar dan memalsukan titah sultan"],["Fasal 26","Pernikahan memerlukan empat orang saksi"],["Fasal 30","Amalan riba diharamkan dalam perniagaan"]],
+       hint:"Fasal 1 menerangkan peranan sultan dan pembesar.",
+       fact:"Hukum Kanun Melaka meliputi aspek jenayah, peranan sultan dan pembesar, kekeluargaan, ekonomi dan percukaian."},
+      {e:"🗂️", l:"Rak Undang-undang", type:"classify", q:"Kelaskan perkara berikut mengikut undang-undang yang betul.",
+       groups:["Hukum Kanun","Undang-Undang Laut"],
+       items:[["Pernikahan memerlukan empat orang saksi",0],["Orang yang berniaga mesti akil baligh dan siuman",0],["Nakhoda diberi keutamaan berniaga selama empat hari",1],["Malim perlu arif tentang ombak, arus, bulan dan bintang",1],["Hukuman mati bagi pembunuh di atas kapal",1],["Hukuman bunuh bagi pembunuh tanpa pengetahuan raja atau pembesar",0]],
+       hint:"Undang-Undang Laut berkaitan kapal, nakhoda dan malim.",
+       fact:"Hukum Kanun Melaka: jenayah, kekeluargaan, ekonomi, percukaian. Undang-Undang Laut Melaka: peranan nakhoda, pelayaran dan jenayah di atas kapal."},
+      {e:"⚓", l:"Sauh Nakhoda", type:"multi", q:"Pilih <b>TIGA</b> nakhoda yang mengusahakan Undang-Undang Laut Melaka.",
+       opts:["Nakhoda Jenal","Nakhoda Diri","Nakhoda Sahak","Laksamana Cheng Ho","Syahbandar","Temenggung"], ans:[0,1,2],
+       hint:"Ketiga-tiganya bergelar Nakhoda.",
+       fact:"Undang-Undang Laut Melaka diusahakan oleh Nakhoda Jenal, Nakhoda Diri dan Nakhoda Sahak."},
+      {e:"👑", l:"Titah Diraja", type:"mcq", q:"Undang-Undang Laut Melaka diperkenankan oleh…",
+       opts:["Sultan Mahmud Shah","Laksamana Cheng Ho","Bendahara","Syahbandar"], ans:0,
+       hint:"Hanya sultan yang boleh memperkenankan undang-undang.",
+       fact:"Undang-Undang Laut Melaka diperkenankan oleh Sultan Mahmud Shah."},
+      {e:"📅", l:"Kalendar Dagang", type:"mcq", q:"Menurut Fasal 13.1 Undang-Undang Laut Melaka, nakhoda perlu diberikan keutamaan untuk berniaga selama…",
+       opts:["empat hari","tiga hari","tujuh hari","empat bulan"], ans:0,
+       hint:"Sama dengan bilangan saksi pernikahan dalam Fasal 26.",
+       fact:"Fasal 13.1: nakhoda diberi keutamaan berniaga selama empat hari. Fasal 13.3: nakhoda perlu bermesyuarat sebelum singgah di tempat yang tiada dalam senarai persinggahan."},
+      {e:"🌊", l:"Kompas Malim", type:"mcq", q:"Menurut Fasal 9, apakah akibatnya jika malim lalai sehingga menyebabkan pelanggaran dan kerosakan?",
+       opts:["Dijatuhi hukuman bunuh","Dibuang negeri","Didenda satu persepuluh hasil","Dilucutkan jawatan"], ans:0,
+       hint:"Hukumannya paling berat.",
+       fact:"Malim mesti arif tentang ombak, arus serta kedudukan bulan dan bintang. Malim yang lalai sehingga berlaku pelanggaran dan kerosakan dijatuhi hukuman bunuh."}
+    ]},
+  { ic:"🌾", nama:"Balai Rakyat", sub:"1.4 Peranan Pemerintah dan Rakyat",
+    story:"Anda berada di balai rakyat kampung Melaka. Hubungan sultan, pembesar dan rakyat diikat oleh satu perjanjian. Buka setiap kunci untuk mendedahkan konsep itu!",
+    word:"WAADAT", clue:"Konsep perjanjian yang mengikat hubungan rakyat dengan sultan dan pembesar.",
+    puzzles:[
+      {e:"🗃️", l:"Fail Peranan", type:"classify", q:"Kelaskan peranan berikut mengikut golongan.",
+       groups:["Sultan","Pembesar","Rakyat"],
+       items:[["Menaungi dan menjaga keselamatan rakyat negeri",0],["Memperkenalkan undang-undang untuk mengawal rakyat",0],["Menjadi perantara antara sultan dengan rakyat",1],["Memelihara keamanan dan kebajikan rakyat di kawasan pegangan",1],["Menunjukkan taat setia kepada pemerintah",2],["Menjadi pengayuh atau pendayung kapal perang",2]],
+       hint:"Pembesar bertugas di kawasan pegangan.",
+       fact:"Sultan menaungi rakyat dan mewujudkan perpaduan; pembesar menjadi perantara dan menjaga kawasan pegangan; rakyat taat setia, menjadi tentera dan menghadiri majlis umum."},
+      {e:"👥", l:"Senarai Istana", type:"multi", q:"Pilih <b>EMPAT</b> golongan pemerintah.",
+       opts:["Sultan","Pembesar","Kerabat raja","Ulama","Peniaga","Nelayan"], ans:[0,1,2,3],
+       hint:"Peniaga dan nelayan termasuk dalam golongan rakyat.",
+       fact:"Golongan pemerintah terdiri daripada sultan, pembesar, kerabat raja dan ulama."},
+      {e:"🌾", l:"Guni Hasil", type:"fill",
+       text:"Pembesar mengutip hasil melalui sistem {0} dan membekalkan tenaga tentera melalui sistem {1}.",
+       bank:["serah","kerah","ahli","waadat","pegangan"], ans:["serah","kerah"],
+       hint:"Hasil 'diserahkan'; tenaga 'dikerahkan'.",
+       fact:"Pembesar mengutip hasil melalui sistem serah dan membekalkan tenaga tentera melalui sistem kerah."},
+      {e:"⚡", l:"Kilat Amaran", type:"scramble", ans:"TULAH",
+       q:"Susun huruf! Rakyat mematuhi segala arahan pemerintah dan tidak akan menderhaka kerana takut ditimpa…",
+       hint:"Lima huruf, bermula dengan T.",
+       fact:"Rakyat mematuhi arahan pemerintah dan tidak menderhaka kerana takut ditimpa tulah."},
+      {e:"⛓️", l:"Daftar Hamba", type:"multi", q:"Pilih <b>TIGA</b> jenis hamba dalam masyarakat Melaka.",
+       opts:["Hamba raja","Hamba berhutang","Hamba biasa","Hamba istana","Hamba pelabuhan","Hamba nakhoda"], ans:[0,1,2],
+       hint:"Salah satunya berkaitan hutang.",
+       fact:"Rakyat terdiri daripada peniaga, petani, tukang dan nelayan. Hamba terdiri daripada hamba raja, hamba berhutang dan hamba biasa."},
+      {e:"🧱", l:"Batu Bata", type:"mcq", q:"Apakah contoh sumbangan tenaga kerja rakyat melalui sistem kerah?",
+       opts:["Membina istana atau jalan","Mengutip cukai di pelabuhan","Menjadi malim kapal dagang","Menggubal undang-undang"], ans:0,
+       hint:"Berkaitan pembinaan.",
+       fact:"Rakyat menyumbang tenaga kerja melalui sistem kerah seperti membina istana atau jalan, serta menghadiri majlis umum seperti gotong-royong."}
+    ]}
+  ]
+},
+/* ============================== BAB 3 ============================== */
+{ id:"b3", no:"BAB 3", nama:"Konflik Dunia dan Pendudukan Jepun di Negara Kita", tema:"Misi Telegram 1914–1945", ic:"📟", acc:"#c9a227", acc2:"#4a5a2a",
+  desc:"Nasionalisme awal, Perang Dunia Pertama & Kedua, kedatangan dan dasar pendudukan Jepun serta perjuangan rakyat.",
+  mix:{ word:"EROPAH", clue:"Benua tempat kuasa imperialis seperti Perancis dan Jerman bersaing sehingga tercetusnya Perang Dunia Pertama." },
+  rooms:[
+  { ic:"📰", nama:"Bilik Percetakan Akhbar", sub:"3.1 Kesedaran Awal Nasionalisme",
+    story:"Anda terkurung dalam sebuah bilik percetakan akhbar Melayu yang telah dikunci oleh pegawai British. Setiap objek di bilik ini berkunci. Pecahkan semua kunci, kumpulkan huruf rahsia dan buka pintu keluar sebelum masa tamat!",
+    word:"BRITISH", clue:"Kuasa yang memperkenalkan Enakmen Undang-Undang Islam 1904 dan mengawal ketat kegiatan yang mengancam kedudukannya.",
+    puzzles:[
+      {e:"📜", l:"Gulungan Enakmen", type:"code", ans:"1904",
+       q:"Gulungan ini berkunci 4 digit. Kodnya ialah <b>tahun</b> Enakmen Undang-Undang Islam yang dipersetujui Raja-raja Melayu.",
+       hint:"Tahun itu terdapat pada nama penuh enakmen tersebut: Enakmen Undang-Undang Islam 19__.",
+       fact:"Enakmen Undang-Undang Islam 1904 diperkenalkan British dan dipersetujui oleh Raja-raja Melayu."},
+      {e:"🧭", l:"Kompas Timur Tengah", type:"mcq",
+       q:"Apakah tujuan British memperkenalkan Enakmen Undang-Undang Islam 1904?",
+       opts:["Membendung pengaruh idea gerakan Islam dari Timur Tengah","Menggalakkan penerbitan akhbar dan majalah Melayu","Mengukuhkan hubungan dengan empayar Uthmaniyah","Memberikan kebebasan bersuara kepada penduduk tempatan"], ans:0,
+       hint:"Lihat nama objek ini. Dari manakah idea gerakan Islam itu datang?",
+       fact:"British berusaha membendung pengaruh idea gerakan Islam dari Timur Tengah."},
+      {e:"⚖️", l:"Buku Hukuman", type:"mcq",
+       q:"Di bawah Enakmen 1904, apakah hukuman bagi sesiapa yang menyebarkan tulisan berkaitan agama dan politik Islam <b>tanpa keizinan sultan</b>?",
+       opts:["Hukuman penjara","Dibuang negeri","Tanah dirampas","Hukuman sebat"], ans:0,
+       hint:"Pesalah akan dikurung.",
+       fact:"Enakmen ini mengenakan hukuman penjara kepada sesiapa yang menyebarkan tulisan agama dan politik Islam tanpa keizinan sultan."},
+      {e:"🗂️", l:"Fail Sulit", type:"multi",
+       q:"Pilih <b>DUA</b> badan penyiasat yang diperkenalkan British untuk mengawal gerakan Islah Islamiah.",
+       opts:["Jabatan Siasatan Jenayah","Biro Siasatan Politik","Jabatan Kastam","Jabatan Ukur","Jabatan Pertanian"], ans:[0,1],
+       hint:"Satu badan menyiasat jenayah, satu lagi menyiasat hal politik.",
+       fact:"British memperkenalkan Jabatan Siasatan Jenayah dan Biro Siasatan Politik untuk mengawal gerakan Islah Islamiah."},
+      {e:"✉️", l:"Surat Pejuang", type:"scramble", ans:"TOK JANGGUT",
+       q:"Susun huruf! Rentetan kebangkitan masyarakat Islam sedunia, termasuk penglibatan empayar Uthmaniyah dalam Perang Dunia Pertama di Eropah, pemimpin negeri Melayu ini bangkit memperjuangkan agama Islam dan hak penduduk tempatan.",
+       hint:"Dua perkataan: 3 huruf dan 7 huruf.",
+       fact:"Tok Janggut bangkit memperjuangkan agama Islam dan hak penduduk tempatan."},
+      {e:"🖨️", l:"Mesin Cetak", type:"fill", anyOrder:true,
+       text:"Bahan bertulis seperti {0} dan {1} digunakan untuk meniupkan semangat nasionalisme dalam kalangan masyarakat.",
+       bank:["akhbar","majalah","radio","poster","filem"], ans:["akhbar","majalah"],
+       hint:"Kedua-duanya bahan bacaan bercetak.",
+       fact:"Akhbar dan majalah digunakan untuk meniupkan semangat nasionalisme dalam kalangan masyarakat."},
+      {e:"📕", l:"Akhbar Terlarang", type:"mcq",
+       q:"Undang-undang yang mengawal kebebasan bersuara, penerbitan dan berpersatuan serta kawalan ketat British telah menyebabkan…",
+       opts:["Kurangnya kesedaran nasionalisme dalam akhbar Melayu sebelum Perang Dunia Kedua","Akhbar Melayu bebas mengkritik pentadbiran British","Raja-raja Melayu menolak Enakmen Undang-Undang Islam 1904","Bertambahnya badan penyiasat di negeri Melayu"], ans:0,
+       hint:"Kawalan yang ketat biasanya MELEMAHKAN sesuatu.",
+       fact:"Kawalan ketat British menyebabkan kurangnya kesedaran nasionalisme dalam akhbar Melayu sebelum Perang Dunia Kedua."}
+    ]},
+  { ic:"🗺️", nama:"Bilik Peta Perang", sub:"3.2 Faktor Tercetusnya Perang Dunia Pertama",
+    story:"Tahun 1914. Anda terperangkap di bilik peta seorang jeneral di Eropah. Pecahkan kunci setiap objek untuk mendedahkan punca peperangan, kemudian lolos melalui pintu rahsia!",
+    word:"BALKAN", clue:"Krisis di rantau inilah yang menjadi salah satu faktor tercetusnya Perang Dunia Pertama.",
+    puzzles:[
+      {e:"🏭", l:"Cerobong Kilang", type:"mcq",
+       q:"Perkembangan apakah yang menyebabkan kuasa imperialis di Eropah seperti Perancis dan Jerman bersaing untuk mendapatkan tanah jajahan?",
+       opts:["Revolusi Industri","Revolusi Perancis","Zaman Renaissance","Perang Salib"], ans:0,
+       hint:"Kaitkan dengan kilang dan hasil industri.",
+       fact:"Perkembangan Revolusi Industri menyebabkan kuasa imperialis Eropah bersaing untuk mendapatkan tanah jajahan."},
+      {e:"🌍", l:"Glob Jajahan", type:"multi",
+       q:"Pilih <b>DUA</b> tujuan kuasa imperialis mendapatkan tanah jajahan.",
+       opts:["Memperoleh bahan mentah","Memasarkan hasil industri","Menghantar pelajar ke luar negara","Membina pakatan dengan Serbia","Mengurangkan penduduk Eropah"], ans:[0,1],
+       hint:"Kilang memerlukan bahan untuk diproses dan pembeli untuk barangannya.",
+       fact:"Tanah jajahan diperlukan untuk memperoleh bahan mentah serta memasarkan hasil industri."},
+      {e:"🗃️", l:"Kabinet Fail", type:"classify",
+       q:"Kelaskan setiap pernyataan mengikut faktor tercetusnya Perang Dunia Pertama.",
+       groups:["Imperialis","Pakatan","Balkan"],
+       groupsFull:["Persaingan kuasa imperialis","Pakatan ketenteraan","Krisis rantau Balkan"],
+       items:[["Perancis dan Jerman bersaing mendapatkan tanah jajahan",0],["Keperluan bahan mentah dan pasaran hasil industri",0],["Terbentuknya Kuasa Tengah dan Pakatan Bertiga",1],["Ketidakstabilan politik yang berterusan di Eropah",1],["Permusuhan Austria-Hungary dengan Serbia",2],["Pembunuhan Putera Mahkota Austria-Hungary",2]],
+       hint:"Setiap faktor mempunyai DUA pernyataan.",
+       fact:"Tiga faktor tercetusnya Perang Dunia Pertama: persaingan kuasa imperialis, pakatan ketenteraan dan krisis rantau Balkan."},
+      {e:"🎖️", l:"Lencana Pakatan", type:"mcq",
+       q:"Pakatan ketenteraan seperti Kuasa Tengah dan Pakatan Bertiga terbentuk kesan daripada…",
+       opts:["Permusuhan antara kuasa Eropah","Perjanjian damai antara Jerman dan Rusia","Kebangkitan masyarakat Islam sedunia","Enakmen Undang-Undang Islam 1904"], ans:0,
+       hint:"Kuasa-kuasa Eropah ketika itu tidak sebulu.",
+       fact:"Pakatan ketenteraan terbentuk kesan permusuhan antara kuasa Eropah dan menyebabkan ketidakstabilan politik berterusan di Eropah."},
+      {e:"👑", l:"Mahkota Diraja", type:"mcq",
+       q:"Apakah peristiwa kemuncak krisis rantau Balkan?",
+       opts:["Archduke Ferdinand dan isterinya, Sophie dibunuh oleh seorang pemuda Serbia","Raja Serbia dibunuh oleh seorang pegawai Jerman","Rusia menawan ibu kota Austria-Hungary","Itali mengisytiharkan perang terhadap Serbia"], ans:0,
+       hint:"Mangsanya ialah Putera Mahkota Austria-Hungary.",
+       fact:"Kemuncak krisis Balkan: Putera Mahkota Austria-Hungary, Archduke Ferdinand dan isterinya Sophie dibunuh oleh seorang pemuda Serbia."},
+      {e:"🔐", l:"Peti Besi", type:"scramble", ans:"SERBIA",
+       q:"Susun huruf! Negara yang bermusuhan dengan Austria-Hungary sehingga berlakunya krisis rantau Balkan.",
+       hint:"Pembunuh Archduke Ferdinand ialah seorang pemuda dari negara ini.",
+       fact:"Krisis rantau Balkan berlaku akibat permusuhan Austria-Hungary dengan Serbia."}
+    ]},
+  { ic:"🏰", nama:"Markas Pakatan", sub:"3.2 Pihak yang Terlibat dalam Perang Dunia Pertama",
+    story:"Anda menyamar masuk ke markas perisikan. Bendera dan dokumen negara-negara bercampur aduk! Susun semula pakatan yang betul untuk membuka setiap kunci dan meloloskan diri.",
+    word:"TENGAH", clue:"Jerman dan Austria-Hungary menganggotai pakatan Kuasa ______.",
+    puzzles:[
+      {e:"🚩", l:"Bendera Utama", type:"classify",
+       q:"Kelaskan negara <b>anggota</b> mengikut pakatan masing-masing.",
+       groups:["Kuasa Tengah","Pakatan Bertiga"],
+       items:[["Jerman",0],["Austria-Hungary",0],["Britain",1],["Perancis",1],["Rusia",1]],
+       hint:"Kuasa Tengah: 2 negara. Pakatan Bertiga: 3 negara, seperti namanya.",
+       fact:"Kuasa Tengah: Jerman dan Austria-Hungary. Pakatan Bertiga: Britain, Perancis dan Rusia."},
+      {e:"🎌", l:"Bendera Sekutu", type:"classify",
+       q:"Kelaskan negara yang <b>menyusuli atau menyokong</b> setiap pakatan.",
+       groups:["Kuasa Tengah","Pakatan Bertiga"],
+       items:[["Bulgaria",0],["Empayar Uthmaniyah",0],["Serbia",1],["Itali",1],["Romania",1],["Portugal",1],["Greece",1]],
+       hint:"Hanya DUA yang menyusuli Kuasa Tengah.",
+       fact:"Kuasa Tengah disusuli oleh Bulgaria dan empayar Uthmaniyah. Pakatan Bertiga disokong oleh Serbia, Itali, Romania, Portugal dan Greece."},
+      {e:"🕵️", l:"Pengintip Palsu", type:"mcq",
+       q:"Antara berikut, negara manakah <strong>BUKAN</strong> penyokong Pakatan Bertiga?",
+       opts:["Bulgaria","Serbia","Portugal","Greece"], ans:0,
+       hint:"Negara ini menyusuli Jerman dan Austria-Hungary.",
+       fact:"Bulgaria menyusuli Kuasa Tengah, bukan Pakatan Bertiga."},
+      {e:"🕌", l:"Peta Empayar", type:"scramble", ans:"UTHMANIYAH",
+       q:"Susun huruf! Empayar yang menyusuli Kuasa Tengah dan turut terlibat dalam Perang Dunia Pertama di Eropah.",
+       hint:"Empayar ini bermula dengan huruf U.",
+       fact:"Empayar Uthmaniyah menyusuli Kuasa Tengah dalam Perang Dunia Pertama."},
+      {e:"🤝", l:"Meja Rundingan", type:"multi",
+       q:"Pilih <b>TIGA</b> negara anggota Pakatan Bertiga.",
+       opts:["Britain","Perancis","Rusia","Jerman","Austria-Hungary","Bulgaria"], ans:[0,1,2],
+       hint:"Ketiga-tiganya berperang menentang Jerman.",
+       fact:"Anggota Pakatan Bertiga ialah Britain, Perancis dan Rusia."},
+      {e:"🪖", l:"Topi Askar", type:"mcq",
+       q:"Kuasa Tengah dianggotai oleh…",
+       opts:["Jerman dan Austria-Hungary","Britain dan Perancis","Rusia dan Serbia","Itali dan Greece"], ans:0,
+       hint:"Pihak yang mengisytiharkan perang terhadap Serbia dan penyokongnya.",
+       fact:"Jerman dan Austria-Hungary menganggotai Kuasa Tengah."}
+    ]},
+  { ic:"📟", nama:"Bilik Telegram", sub:"3.2 Peristiwa & Berakhirnya Perang Dunia Pertama",
+    story:"Mesin telegram berbunyi tanpa henti! Mesej perang dari tahun 1914 hingga 1918 berselerak. Susun semula peristiwa, pecahkan kod dan hantar telegram terakhir untuk keluar.",
+    word:"SENJATA", clue:"Jerman dipaksa menandatangani gencatan _______.",
+    puzzles:[
+      {e:"🗓️", l:"Kalendar 1914", type:"order",
+       q:"Susun peristiwa <b>Julai – Ogos 1914</b> mengikut urutan yang betul.",
+       items:["Austria-Hungary dengan sokongan Jerman mengisytiharkan perang terhadap Serbia","Rusia memberikan bantuan ketenteraan kepada Serbia","Jerman mengisytiharkan perang terhadap Rusia","Jerman mengisytiharkan perang terhadap Perancis dan menceroboh Belgium","Britain menyertai Rusia dan Perancis memerangi Jerman"],
+       hint:"Mulakan dengan Austria-Hungary mengisytiharkan perang terhadap Serbia (28 Julai 1914).",
+       fact:"28 Julai → 30 Julai → 1 Ogos → 3 Ogos → 4 Ogos 1914."},
+      {e:"⏳", l:"Jam Pasir", type:"order",
+       q:"Susun peristiwa dari <b>Oktober 1914 hingga 1918</b> mengikut urutan yang betul.",
+       items:["Empayar Uthmaniyah menyertai peperangan memihak Kuasa Tengah","Itali menyertai Perancis, Britain dan Rusia dalam Pakatan Bertiga","Amerika Syarikat menyertai peperangan memihak Pakatan Bertiga","Kejayaan berpihak kepada Pakatan Bertiga dengan bantuan Amerika Syarikat"],
+       hint:"Peristiwa terakhir ialah kemenangan.",
+       fact:"Oktober 1914: Uthmaniyah • Mac 1915: Itali • April 1917: Amerika Syarikat • 1918: Pakatan Bertiga menang."},
+      {e:"🔢", l:"Kod Telegram", type:"code", ans:"1917",
+       q:"Masukkan <b>tahun</b> Amerika Syarikat menyertai peperangan memihak Pakatan Bertiga (April ____).",
+       hint:"Setahun sebelum kejayaan Pakatan Bertiga pada 1918.",
+       fact:"April 1917: Amerika Syarikat menyertai peperangan memihak Pakatan Bertiga."},
+      {e:"🔗", l:"Papan Suis", type:"match",
+       q:"Padankan tarikh dengan peristiwa yang betul.",
+       pairs:[["28 Julai 1914","Austria-Hungary isytihar perang terhadap Serbia"],["30 Julai 1914","Rusia beri bantuan ketenteraan kepada Serbia"],["Oktober 1914","Empayar Uthmaniyah memihak Kuasa Tengah"],["Mac 1915","Itali menyertai Pakatan Bertiga"]],
+       hint:"Rusia bertindak dua hari selepas perang diisytiharkan terhadap Serbia.",
+       fact:"28 Julai 1914: Austria-Hungary–Serbia • 30 Julai: Rusia bantu Serbia • Oktober 1914: Uthmaniyah • Mac 1915: Itali."},
+      {e:"🛡️", l:"Perisai Belgium", type:"mcq",
+       q:"Mengapakah Britain menyertai Rusia dan Perancis memerangi Jerman pada 4 Ogos 1914?",
+       opts:["Jerman menceroboh Belgium","Jerman menyerang Britain secara langsung","Empayar Uthmaniyah menyertai Kuasa Tengah","Serbia menyerang Austria-Hungary"], ans:0,
+       hint:"Lihat nama objek ini.",
+       fact:"Britain menyertai Rusia dan Perancis memerangi Jerman yang menceroboh Belgium."},
+      {e:"📨", l:"Telegram Paris", type:"mcq",
+       q:"Pada 3 Ogos 1914, Jerman mengisytiharkan perang terhadap Perancis kerana Perancis…",
+       opts:["menyebelahi Rusia","menyerang Austria-Hungary","menyokong empayar Uthmaniyah","menceroboh Belgium"], ans:0,
+       hint:"Perancis berpihak kepada negara yang diisytiharkan perang oleh Jerman pada 1 Ogos 1914.",
+       fact:"Jerman mengisytiharkan perang terhadap Perancis yang menyebelahi Rusia."},
+      {e:"🕊️", l:"Merpati Damai", type:"fill",
+       text:"Akibat peperangan, {0} dipaksa menandatangani gencatan senjata manakala {1} diiktiraf sebagai kuasa besar dunia.",
+       bank:["Jerman","Amerika Syarikat","Rusia","Britain","Serbia"], ans:["Jerman","Amerika Syarikat"],
+       hint:"Pihak yang kalah, dan pihak yang membantu kemenangan pada tahun 1918.",
+       fact:"Jerman dipaksa menandatangani gencatan senjata; Amerika Syarikat diiktiraf sebagai kuasa besar dunia."}
+    ]},
+  { ic:"📜", nama:"Dewan Persidangan Paris", sub:"3.2 Perdamaian & Kesan Perang Dunia Pertama",
+    story:"Perang telah tamat. Anda terkunci di dewan persidangan damai bersama dokumen-dokumen perjanjian. Fahami syarat perdamaian dan kesan perang untuk keluar!",
+    word:"WOODROW", clue:"Deklarasi 14 Perkara yang dilahirkan di Persidangan Damai Paris dikaitkan dengan ______ Wilson.",
+    puzzles:[
+      {e:"🗓️", l:"Diari Persidangan", type:"code", ans:"1919",
+       q:"Persidangan Damai Paris diadakan pada 18 Januari <b>____</b>. Masukkan tahunnya.",
+       hint:"Setahun selepas Perang Dunia Pertama berakhir pada 1918.",
+       fact:"Persidangan Damai Paris diadakan pada 18 Januari 1919 untuk membincangkan syarat perdamaian selepas perang."},
+      {e:"📋", l:"Deklarasi 14 Perkara", type:"multi",
+       q:"Pilih <b>DUA</b> prinsip yang dicadangkan dalam Deklarasi 14 Perkara Woodrow Wilson.",
+       opts:["Penentuan nasib negara oleh rakyat","Sempadan negara berasaskan bangsa","Membayar pampasan kepada Pakatan Bertiga","Mengehadkan saiz angkatan tentera","Penubuhan kerajaan komunis"], ans:[0,1],
+       hint:"Kedua-dua prinsip berkaitan rakyat dan bangsa.",
+       fact:"Deklarasi 14 Perkara Woodrow Wilson mencadangkan penentuan nasib negara oleh rakyat dan sempadan negara berasaskan bangsa."},
+      {e:"🗂️", l:"Fail Perjanjian", type:"classify",
+       q:"Kelaskan perkara berikut kepada Persidangan Damai Paris atau Perjanjian Versailles.",
+       groups:["Persidangan Paris","Perjanjian Versailles"],
+       items:[["Diadakan pada 18 Januari 1919",0],["Membincangkan syarat perdamaian",0],["Melahirkan Deklarasi 14 Perkara",0],["Ditandatangani pada 28 Jun 1919",1],["Jerman membayar pampasan kepada Pakatan Bertiga",1],["Penubuhan Liga Bangsa-Bangsa",1]],
+       hint:"Perjanjian Versailles ditandatangani antara Pakatan Bertiga dengan Jerman.",
+       fact:"Perjanjian Versailles (28 Jun 1919): Jerman bertanggungjawab atas kemusnahan, membayar pampasan, mengehadkan tentera, menyerahkan tanah jajahan; Liga Bangsa-Bangsa ditubuhkan."},
+      {e:"🧩", l:"Peta Baharu", type:"classify",
+       q:"Negara baharu muncul selepas keruntuhan empayar. Kelaskan negara baharu mengikut empayar asalnya.",
+       groups:["Austria-Hungary","Rusia","Uthmaniyah"],
+       items:[["Czechoslovakia",0],["Yugoslavia",0],["Poland",1],["Latvia",1],["Estonia",1],["Lebanon",2],["Syria",2],["Iraq",2]],
+       hint:"Negara Asia Barat berasal daripada empayar Uthmaniyah.",
+       fact:"Austria-Hungary: Austria, Hungary, Czechoslovakia, Yugoslavia. Rusia: Poland, Estonia, Latvia, Lithuania. Uthmaniyah: Lebanon, Syria, Iraq."},
+      {e:"🔴", l:"Fail Moscow", type:"mcq",
+       q:"Kerajaan komunis pertama di dunia terbentuk di Rusia di bawah pimpinan…",
+       opts:["Vladimir Lenin","Mustafa Kemal Ataturk","Benito Mussolini","Adolf Hitler"], ans:0,
+       hint:"Pemimpin ini berbangsa Rusia.",
+       fact:"Sistem beraja di Jerman, Austria-Hungary, Rusia dan empayar Uthmaniyah berakhir. Di Rusia, kerajaan komunis pertama di dunia terbentuk di bawah Vladimir Lenin."},
+      {e:"🌙", l:"Fail Istanbul", type:"mcq",
+       q:"Selepas Sultan Mehmed VI digulingkan, siapakah yang mengetuai kerajaan Turki yang bercorak republik?",
+       opts:["Mustafa Kemal Ataturk","Vladimir Lenin","Woodrow Wilson","Subhas Chandra Bose"], ans:0,
+       hint:"Namanya mengandungi 'Kemal'.",
+       fact:"Sultan Mehmed VI, khalifah empayar Uthmaniyah digulingkan dan Mustafa Kemal Ataturk mengetuai kerajaan Turki yang bercorak republik."},
+      {e:"🗞️", l:"Laporan Tanah Melayu", type:"multi",
+       q:"Pilih <b>TIGA</b> kesan Perang Dunia Pertama terhadap negara kita.",
+       opts:["Raja-raja Melayu diminta menandatangani perisytiharan perang","British meluluskan pelbagai undang-undang berkaitan perang","Hasil bijih timah dan getah digunakan untuk membiayai operasi British","Jepun menduduki Tanah Melayu","Pilihan raya majlis perbandaran diadakan"], ans:[0,1,2],
+       hint:"Jepun dan pilihan raya berlaku jauh selepas Perang Dunia Pertama.",
+       fact:"British memanipulasi kemakmuran ekonomi negeri Melayu dengan menggunakan wang hasil bijih timah dan getah untuk membiayai operasinya dalam Perang Dunia Pertama."}
+    ]},
+  { ic:"📻", nama:"Bilik Radio 1939", sub:"3.3 Perang Dunia Kedua",
+    story:"Radio berbunyi: perang besar sekali lagi melanda dunia! Anda terkunci di bilik radio. Fahami punca Perang Dunia Kedua untuk memecahkan setiap kunci.",
+    word:"NAZISME", clue:"Ideologi parti pimpinan Adolf Hitler yang mengagungkan bangsa Jerman.",
+    puzzles:[
+      {e:"🗃️", l:"Fail Ideologi", type:"classify",
+       q:"Kelaskan ciri-ciri berikut kepada fasisme atau nazisme.",
+       groups:["Fasisme","Nazisme"],
+       items:[["Dipimpin oleh Benito Mussolini",0],["Menguasai kerajaan Itali pada tahun 1922",0],["Mengutamakan kepentingan negara melebihi kepentingan individu",0],["Dipimpin oleh Adolf Hitler",1],["Membentuk kerajaan di Jerman pada tahun 1933",1],["Mengagungkan bangsa Jerman dan mengetepikan Perjanjian Versailles",1]],
+       hint:"Fasisme berasal dari Itali; nazisme dari Jerman.",
+       fact:"Fasisme (Itali) dipimpin Benito Mussolini; nazisme (Jerman) dipimpin Adolf Hitler. Kedua-duanya muncul untuk mengatasi masalah kemelesetan ekonomi."},
+      {e:"⚔️", l:"Lambang Pakatan", type:"mcq",
+       q:"Dua pakatan yang terlibat dalam Perang Dunia Kedua ialah…",
+       opts:["Kuasa Paksi dan Kuasa Bersekutu","Kuasa Tengah dan Pakatan Bertiga","Kuasa Paksi dan Pakatan Bertiga","Kuasa Tengah dan Kuasa Bersekutu"], ans:0,
+       hint:"Bukan nama pakatan Perang Dunia Pertama.",
+       fact:"Perang Dunia Kedua (1939–1945) melibatkan Kuasa Paksi dan Kuasa Bersekutu."},
+      {e:"🌐", l:"Glob Medan", type:"multi",
+       q:"Pilih <b>DUA</b> medan pertempuran Perang Dunia Kedua.",
+       opts:["Eropah (Eropah dan utara Afrika)","Asia Pasifik (Tanah Besar Asia dan Kepulauan Asia Tenggara)","Amerika Selatan","Antartika"], ans:[0,1],
+       hint:"Salah satunya melibatkan rantau kita.",
+       fact:"Perang Dunia Kedua berlaku di dua medan: Eropah dan Asia Pasifik."},
+      {e:"✉️", l:"Surat Berlin", type:"mcq",
+       q:"Mengapakah Jerman menganggap Perjanjian Versailles tidak adil?",
+       opts:["Jerman kehilangan tanah jajahan dan perlu membayar pampasan perang yang tinggi","Jerman tidak dijemput ke Liga Bangsa-Bangsa","Jerman dipaksa menyertai Kuasa Bersekutu","Jerman perlu menyerahkan kerajaannya kepada Itali"], ans:0,
+       hint:"Melibatkan wilayah dan wang.",
+       fact:"Jerman kehilangan tanah jajahan dan perlu membayar pampasan perang yang tinggi."},
+      {e:"📮", l:"Surat Rom", type:"mcq",
+       q:"Itali tidak berpuas hati terhadap Perjanjian Versailles kerana…",
+       opts:["tidak diberikan tanah jajahan baharu seperti yang diperoleh Perancis dan Poland","dipaksa membayar pampasan kepada Jerman","kehilangan semua tanah jajahannya","tidak dibenarkan mempunyai angkatan tentera"], ans:0,
+       hint:"Itali berada di pihak yang menang, tetapi merasa tidak mendapat ganjaran.",
+       fact:"Itali tidak diberikan tanah jajahan baharu seperti yang diperoleh Perancis dan Poland."},
+      {e:"🔗", l:"Arkib Liga", type:"match", icon:"📅",
+       q:"Padankan cabaran Liga Bangsa-Bangsa dengan tempohnya.",
+       pairs:[["1931 – 1933","Krisis Manchuria"],["1932 – 1934","Perjanjian Pelucutan Senjata"],["1935 – 1936","Krisis Habsyah"]],
+       hint:"Krisis Manchuria berlaku paling awal.",
+       fact:"Cabaran Liga Bangsa-Bangsa: Krisis Manchuria (1931–1933), Perjanjian Pelucutan Senjata (1932–1934), Krisis Habsyah (1935–1936)."},
+      {e:"🏛️", l:"Pintu Liga", type:"mcq",
+       q:"Kegagalan Liga Bangsa-Bangsa menjadi faktor Perang Dunia Kedua kerana Liga…",
+       opts:["gagal menguatkuasakan perjanjian pelucutan senjata dan menangani krisis pencerobohan","berjaya menghapuskan semua angkatan tentera","menyokong ideologi fasisme dan nazisme","membahagikan tanah jajahan Jerman kepada Itali"], ans:0,
+       hint:"Kata kuncinya: gagal.",
+       fact:"Liga Bangsa-Bangsa gagal menguatkuasakan perjanjian pelucutan senjata dan menangani krisis pencerobohan; dunia terdedah kepada konflik berterusan."}
+    ]},
+  { ic:"🧭", nama:"Bilik Strategi Jepun", sub:"3.5 Faktor Kedatangan Jepun ke Negara Kita",
+    story:"Anda menemui bilik strategi rahsia yang penuh dengan peta dan laporan sumber alam. Bongkar sebab Jepun datang ke negara kita untuk membuka setiap kunci!",
+    word:"BORNEO", clue:"Jepun menguasai Pulau ______ untuk menjayakan operasi penaklukan Pulau Jawa.",
+    puzzles:[
+      {e:"📣", l:"Poster Propaganda", type:"multi",
+       q:"Pilih <b>DUA</b> propaganda yang digunakan Jepun untuk menanamkan semangat antipenjajah Barat.",
+       opts:["\"Semangat Asia\"","\"Asia untuk Orang Asia\"","\"Tambah Lebih Banyak Makanan\"","\"Penentuan nasib oleh rakyat\""], ans:[0,1],
+       hint:"Kedua-duanya mengandungi perkataan 'Asia'.",
+       fact:"Jepun menggunakan propaganda \"Semangat Asia\" dan \"Asia untuk Orang Asia\" serta menonjolkan imej sebagai pembela negara Asia."},
+      {e:"🗃️", l:"Laporan Perisikan", type:"classify",
+       q:"Kelaskan faktor kedatangan Jepun berikut.",
+       groups:["Bahan mentah","Strategik"],
+       groupsFull:["Eksploitasi sumber bahan mentah","Kepentingan strategik ketenteraan"],
+       items:[["Bijih timah dan getah di Tanah Melayu",0],["Sumber minyak di Miri dan Lutong",0],["Keperluan perindustrian ekoran Pembaharuan Meiji",0],["Singapura sebagai pangkalan tentera laut British",1],["Laluan ke telaga minyak di Sumatera",1],["Operasi penaklukan Pulau Jawa melalui Pulau Borneo",1]],
+       hint:"Faktor strategik melibatkan pangkalan dan laluan ketenteraan.",
+       fact:"Faktor kedatangan Jepun: eksploitasi sumber bahan mentah dan kepentingan strategik ketenteraan."},
+      {e:"⛏️", l:"Sampel Lombong", type:"multi",
+       q:"Pilih <b>TIGA</b> bahan mentah dari <b>Tanah Melayu</b> yang menjadi sasaran Jepun.",
+       opts:["Bijih timah","Arang batu","Bauksit","Minyak","Gandum","Kopi"], ans:[0,1,2],
+       hint:"Minyak diperoleh dari Sarawak, bukan Tanah Melayu.",
+       fact:"Tanah Melayu: bijih timah, getah, emas, bijih besi, arang batu dan bauksit. Sarawak: minyak di Miri dan Lutong."},
+      {e:"🏭", l:"Cerobong Meiji", type:"scramble", ans:"MEIJI",
+       q:"Susun huruf! Jepun memerlukan bahan mentah untuk memenuhi keperluan perindustrian ekoran Pembaharuan…",
+       hint:"Lima huruf, bermula dengan M.",
+       fact:"Bahan mentah diperlukan untuk memenuhi keperluan perindustrian ekoran Pembaharuan Meiji dan operasi ketenteraan."},
+      {e:"🌏", l:"Rancangan Besar", type:"mcq",
+       q:"Pendudukan Jepun merupakan salah satu rancangan untuk menjayakan pembentukan…",
+       opts:["Kawasan Lingkungan Sekemakmuran Asia Timur Raya","Liga Bangsa-Bangsa","Kuasa Paksi Asia Tenggara","Pakatan Bertiga Asia"], ans:0,
+       hint:"Bertujuan mengukuhkan ekonomi Jepun.",
+       fact:"Pendudukan Jepun merupakan rancangan menjayakan Kawasan Lingkungan Sekemakmuran Asia Timur Raya untuk mengukuhkan ekonomi Jepun."},
+      {e:"⚓", l:"Pangkalan Laut", type:"mcq",
+       q:"Kedudukan strategik Tanah Melayu terutamanya di hujung Semenanjung yang terletak pangkalan tentera laut British, iaitu…",
+       opts:["Singapura","Pulau Pinang","Kuantan","Kota Bharu"], ans:0,
+       hint:"Di hujung selatan Semenanjung.",
+       fact:"Singapura di hujung Semenanjung Tanah Melayu ialah pangkalan tentera laut British."}
+    ]},
+  { ic:"📍", nama:"Peta Kemaraan", sub:"3.5 Serangan Jepun terhadap Negara Kita",
+    story:"Anda terperangkap di bilik peta operasi. Laluan kemaraan tentera Jepun dari utara ke selatan dan di Borneo telah dicuri! Susun semula untuk memecahkan kunci.",
+    word:"KUANTAN", clue:"Kapal Repulse dan Prince of Wales ditenggelamkan oleh tentera Jepun di perairan ______.",
+    puzzles:[
+      {e:"🔢", l:"Kod Serangan", type:"code", ans:"1941",
+       q:"Serangan Jepun di Tanah Melayu bermula pada 8 Disember <b>____</b>. Masukkan tahunnya.",
+       hint:"Serangan terhadap Sarawak dan Sabah bermula pada 16 Disember tahun yang sama.",
+       fact:"Serangan Jepun di Tanah Melayu bermula pada 8 Disember 1941; serangan terhadap Sarawak dan Sabah bermula pada 16 Disember 1941."},
+      {e:"🏖️", l:"Pantai Pendaratan", type:"multi",
+       q:"Pilih <b>EMPAT</b> lokasi pendaratan serentak Jepun pada 8 Disember 1941.",
+       opts:["Pantai Kuala Pak Amat","Pantai Sabak","Singgora","Patani","Port Swettenham","Kuantan"], ans:[0,1,2,3],
+       hint:"Dua di Kelantan dan dua di Thailand.",
+       fact:"Pendaratan serentak berlaku di Pantai Kuala Pak Amat, Pantai Sabak, Kota Bharu dan Thailand (Singgora dan Patani)."},
+      {e:"🗃️", l:"Laluan Rahsia", type:"classify",
+       q:"Kelaskan pergerakan tentera Jepun mengikut arah kemaraannya.",
+       groups:["Dari Thailand","Dari Kota Bharu"],
+       items:[["Memasuki Kedah dan berpecah kepada dua pasukan",0],["Satu pasukan ke Pulau Pinang melalui pesisiran pantai barat",0],["Sepasukan mengikut jalan darat ke bandar utama pantai barat",0],["Mara ke selatan mengikut jalan darat negeri-negeri pantai timur",1],["Menenggelamkan Repulse dan Prince of Wales di perairan Kuantan",1]],
+       hint:"Pasukan dari Kota Bharu bergerak di pantai timur.",
+       fact:"Dari Thailand: masuk Kedah, berpecah dua (Pulau Pinang & pantai barat). Dari Kota Bharu: mara ke selatan di pantai timur."},
+      {e:"🧭", l:"Jejak Semenanjung", type:"order",
+       q:"Susun lokasi yang dikuasai Jepun mengikut <b>urutan masa</b> (rujuk peta kemaraan).",
+       items:["Kota Bharu","Pulau Pinang","Ipoh","Kuala Lumpur","Johor Bahru","Singapura"],
+       hint:"Bermula di utara (8 Dis 1941) dan berakhir di selatan (15 Feb 1942).",
+       fact:"Kota Bharu (8 Dis 1941) → Pulau Pinang (17 Dis) → Ipoh (26 Dis) → Kuala Lumpur (11 Jan 1942) → Johor Bahru (31 Jan) → Singapura (15 Feb 1942)."},
+      {e:"🏳️", l:"Bendera Putih", type:"mcq",
+       q:"Keseluruhan Tanah Melayu jatuh ke tangan tentera Jepun apabila Singapura ditawan pada…",
+       opts:["15 Februari 1942","8 Disember 1941","31 Januari 1942","16 Disember 1941"], ans:0,
+       hint:"Bulan kedua tahun 1942.",
+       fact:"Keseluruhan Tanah Melayu jatuh ke tangan Jepun apabila Singapura ditawan pada 15 Februari 1942."},
+      {e:"🏝️", l:"Jejak Borneo", type:"order",
+       q:"Susun kemaraan tentera Jepun di <b>Sarawak dan Sabah</b> mengikut urutan masa.",
+       items:["Miri","Kuching","Labuan","Jesselton","Sandakan"],
+       hint:"Jepun mendarat di Miri dahulu; Sandakan melengkapkan kempen di Sabah.",
+       fact:"Miri (16 Dis 1941) → Kuching (24 Dis) → Labuan (1 Jan 1942) → Jesselton (9 Jan) → Sandakan (19 Jan 1942)."},
+      {e:"🚢", l:"Bangkai Kapal", type:"mcq",
+       q:"Apakah nama kapal British yang digerakkan untuk menyekat kemaraan Jepun tetapi ditenggelamkan oleh tentera Jepun?",
+       opts:["Repulse dan Prince of Wales","Singgora dan Patani","Jesselton dan Sandakan","Force 136 dan MPAJA"], ans:0,
+       hint:"Salah satunya dinamakan sempena putera diraja British.",
+       fact:"Kapal Repulse dan Prince of Wales digerakkan untuk menyekat kemaraan Jepun tetapi ditenggelamkan di perairan Kuantan."}
+    ]},
+  { ic:"🏢", nama:"Pejabat Gabenor Jepun", sub:"3.6 Dasar Pentadbiran Jepun",
+    story:"Anda terkunci di pejabat Gabenor Jepun. Fail-fail pentadbiran dan dasar terhadap raja serta pemimpin tempatan disimpan di sini. Selesaikan setiap fail untuk keluar!",
+    word:"BORUNEO", clue:"Sarawak, Sabah dan Brunei digabungkan menjadi satu unit pentadbiran yang dikenali sebagai Kita ______.",
+    puzzles:[
+      {e:"🎌", l:"Arahan Tentera", type:"mcq",
+       q:"Pentadbiran tentera Jepun memperkenalkan…",
+       opts:["Pemerintahan Tentera Tanah Melayu","Sistem Ahli","Majlis Perundangan Persekutuan","Sistem Pembesar Empat Lipatan"], ans:0,
+       hint:"Pentadbiran ini bersifat ketenteraan.",
+       fact:"Jepun memperkenalkan Pemerintahan Tentera Tanah Melayu."},
+      {e:"🗺️", l:"Peta Kawasan Khas", type:"mcq",
+       q:"Tanah Melayu digabungkan dengan … membentuk Kawasan Pertahanan Khas.",
+       opts:["Sumatera","Singapura","Thailand","Borneo"], ans:0,
+       hint:"Pentadbiran kedua-duanya kemudian diasingkan kerana perbezaan sistem politik dan ekonomi.",
+       fact:"Tanah Melayu digabungkan dengan Sumatera membentuk Kawasan Pertahanan Khas, kemudian diasingkan kerana perbezaan sistem politik dan ekonomi."},
+      {e:"🏙️", l:"Papan Tanda Kota", type:"scramble", ans:"SYONAN TO",
+       q:"Susun huruf! Singapura diasingkan daripada pentadbiran Tanah Melayu dan dikenali sebagai…",
+       hint:"Ditulis 'Syonan-to'.",
+       fact:"Pentadbiran Singapura diasingkan dari Tanah Melayu dan dikenali sebagai Syonan-to."},
+      {e:"🐘", l:"Fail Bangkok", type:"multi",
+       q:"Pilih <b>EMPAT</b> negeri Melayu yang diletakkan di bawah pentadbiran kerajaan Thailand.",
+       opts:["Perlis","Kedah","Kelantan","Terengganu","Perak","Pahang"], ans:[0,1,2,3],
+       hint:"Negeri-negeri di utara Semenanjung.",
+       fact:"Perlis, Kedah, Kelantan dan Terengganu diletakkan di bawah pentadbiran kerajaan Thailand."},
+      {e:"🗃️", l:"Fail Dasar", type:"classify",
+       q:"Kelaskan dasar Jepun berikut.",
+       groups:["Raja-raja Melayu","Pemimpin tempatan"],
+       items:[["Diiktiraf sebagai ketua agama Islam dan adat Melayu",0],["Diberikan bayaran pencen seperti sebelum perang",0],["Kedudukan diletakkan di bawah pengawasan Gabenor Jepun",0],["Diberi kenaikan pangkat ke jawatan lebih tinggi",1],["Untuk mengatasi kekurangan pegawai dan mendapat sokongan penduduk",1],["Dilatih di Institut Latihan Pemimpin-pemimpin Muda",1]],
+       hint:"Pencen dan hal ehwal agama berkaitan Raja-raja Melayu.",
+       fact:"Raja-raja Melayu diiktiraf sebagai ketua agama Islam dan adat Melayu, diberi pencen, tetapi di bawah pengawasan Gabenor Jepun. Pemimpin tempatan diberi peluang kenaikan pangkat."},
+      {e:"🎓", l:"Sijil Institut", type:"mcq",
+       q:"Institut Latihan Pemimpin-pemimpin Muda atau Koa Kunrenjo ditubuhkan untuk…",
+       opts:["melatih dan menanam semangat memperjuangkan cita-cita politik Jepun dalam kalangan penduduk tempatan","melatih anggota MPAJA melakukan perang gerila","melatih pegawai British mentadbir Tanah Melayu","melatih nakhoda dan malim kapal"], ans:0,
+       hint:"Jepun mahu penduduk menyokong cita-citanya.",
+       fact:"Koa Kunrenjo melatih dan menanam semangat memperjuangkan cita-cita politik Jepun dalam kalangan penduduk tempatan."},
+      {e:"🏝️", l:"Fail Borneo", type:"mcq",
+       q:"Sarawak, Sabah dan Brunei digabungkan menjadi satu unit pentadbiran yang dikenali sebagai…",
+       opts:["Kita Boruneo","Syonan-to","Kawasan Pertahanan Khas","Koa Kunrenjo"], ans:0,
+       hint:"Nama ini berbunyi seperti 'Borneo'.",
+       fact:"Sarawak, Sabah dan Brunei digabungkan menjadi satu unit pentadbiran dikenali sebagai Kita Boruneo."}
+    ]},
+  { ic:"🍌", nama:"Pasar Zaman Jepun", sub:"3.6 Dasar Ekonomi Jepun",
+    story:"Anda terperangkap di sebuah pasar ketika zaman pendudukan Jepun. Makanan dicatu dan wang pelik digunakan. Fahami dasar ekonomi Jepun untuk melarikan diri!",
+    word:"PISANG", clue:"Mata wang Jepun yang menggantikan mata wang British dikenali sebagai wang pokok ______.",
+    puzzles:[
+      {e:"💵", l:"Laci Wang", type:"mcq",
+       q:"Mata wang Jepun yang dicetak untuk menggantikan mata wang British dikenali sebagai…",
+       opts:["Wang pokok pisang","Wang ufti","Wang pampasan","Wang serah"], ans:0,
+       hint:"Bergambar sejenis pokok buah.",
+       fact:"Jepun mencetak mata wang yang dikenali sebagai \"wang pokok pisang\" bagi menggantikan mata wang British."},
+      {e:"📊", l:"Carta Rancangan", type:"multi",
+       q:"Pilih <b>DUA</b> rancangan ekonomi yang diperkenalkan oleh Jepun.",
+       opts:["Rancangan Pengeluaran Lima Tahun","Rancangan Perindustrian Lima Tahun","Sistem Pembesar Empat Lipatan","Deklarasi 14 Perkara"], ans:[0,1],
+       hint:"Kedua-duanya berjangka lima tahun.",
+       fact:"Jepun memperkenalkan Rancangan Pengeluaran Lima Tahun, Jawatankuasa Penyelidikan Bahan dan Rancangan Perindustrian Lima Tahun."},
+      {e:"🗃️", l:"Fail Kilang", type:"classify",
+       q:"Kelaskan tugas berikut.",
+       groups:["Penyelidikan Bahan","Perindustrian"],
+       groupsFull:["Jawatankuasa Penyelidikan Bahan","Rancangan Perindustrian Lima Tahun"],
+       items:[["Mengawal selia pelupusan barangan",0],["Membuat penyelidikan kegunaan baharu bagi sumber tempatan",0],["Membangunkan industri tempatan",1],["Memastikan penggunaan optimum peralatan dan kemudahan sedia ada",1]],
+       hint:"Penyelidikan berkaitan sumber; perindustrian berkaitan industri dan peralatan.",
+       fact:"Jepun melaksanakan sistem ekonomi kawalan akibat kemelesetan ekonomi."},
+      {e:"📦", l:"Gudang Bekalan", type:"mcq",
+       q:"Ordinan Kawalan Barangan dan Bahan Penting diperkenalkan untuk…",
+       opts:["mengawal bekalan barangan akibat kekurangan makanan","menggalakkan eksport bijih timah","mengutip cukai di pelabuhan","membiayai operasi British"], ans:0,
+       hint:"Makanan ketika itu sangat terhad.",
+       fact:"Ordinan Kawalan Barangan dan Bahan Penting mengawal bekalan barangan akibat kekurangan makanan."},
+      {e:"🍚", l:"Kupon Catuan", type:"fill",
+       text:"Jepun menguatkuasakan {0} untuk mengawal penjualan barangan keperluan asas, manakala penduduk menghasilkan {1} daripada bijih getah.",
+       bank:["catuan makanan","tempe","wang pokok pisang","sistem kerah","roti"], ans:["catuan makanan","tempe"],
+       hint:"Makanan daripada biji getah ini biasanya dibuat daripada kacang soya.",
+       fact:"Catuan makanan dikuatkuasakan dan penduduk menghasilkan tempe daripada biji getah."},
+      {e:"🌱", l:"Poster Kempen", type:"mcq",
+       q:"Penduduk digalakkan menanam bahan makanan sendiri melalui kempen…",
+       opts:["\"Tambah Lebih Banyak Makanan\"","\"Asia untuk Orang Asia\"","\"Semangat Asia\"","\"Sekemakmuran Asia Timur Raya\""], ans:0,
+       hint:"Nama kempen berkaitan makanan.",
+       fact:"Penduduk digalakkan menanam bahan makanan sendiri melalui kempen \"Tambah Lebih Banyak Makanan\"."}
+    ]},
+  { ic:"🏫", nama:"Sekolah Zaman Jepun", sub:"3.6 Dasar Sosial Jepun",
+    story:"Loceng berbunyi di sebuah sekolah zaman Jepun. Pintu kelas dikunci! Fahami dasar pendidikan, agama dan layanan Jepun terhadap penduduk untuk meloloskan diri.",
+    word:"SEJAGAT", clue:"Sistem persekolahan Jepun bertujuan membentuk semangat persaudaraan ______.",
+    puzzles:[
+      {e:"🔒", l:"Pintu Sekolah", type:"multi",
+       q:"Pilih <b>DUA</b> jenis sekolah yang <b>ditutup</b> oleh Jepun.",
+       opts:["Sekolah Inggeris","Sekolah Cina","Sekolah agama","Kelas pengajian al-Quran"], ans:[0,1],
+       hint:"Sekolah agama dan kelas al-Quran diteruskan semula oleh Jepun.",
+       fact:"Jepun menutup sekolah Inggeris dan Cina serta menggunakan bangunannya untuk keperluan pentadbiran tentera Jepun."},
+      {e:"📚", l:"Buku Teks", type:"multi",
+       q:"Pilih <b>EMPAT</b> tujuan sistem persekolahan Jepun.",
+       opts:["Membentuk semangat persaudaraan sejagat","Mencapai teknologi industri","Meningkatkan disiplin","Menerapkan nilai Jepun","Menerapkan nilai Barat","Mengukuhkan bahasa Inggeris"], ans:[0,1,2,3],
+       hint:"Jepun mahu menghapuskan pengaruh Barat.",
+       fact:"Jepun berusaha memupuk nasionalisme Asia, menghapuskan pengaruh Barat dan menanam kesetiaan kepada Jepun melalui pendidikan."},
+      {e:"🕌", l:"Fail Agama", type:"multi",
+       q:"Pilih <b>DUA</b> sikap Jepun terhadap agama.",
+       opts:["Menghormati agama Islam dan adat Melayu","Tidak campur tangan dalam adat resam tempatan","Menutup semua sekolah agama","Mengharamkan kelas pengajian al-Quran"], ans:[0,1],
+       hint:"Jepun meneruskan semula kelas pengajian al-Quran.",
+       fact:"Jepun menghormati Islam dan adat Melayu, tidak campur tangan dalam adat resam, meneruskan kelas al-Quran dan sekolah agama."},
+      {e:"📿", l:"Minit Persidangan", type:"mcq",
+       q:"Selain mengadakan persidangan agama Islam di Singapura dan Kuala Kangsar, Jepun turut membentuk…",
+       opts:["Majlis Agama Negeri","Liga Bangsa-Bangsa","Biro Siasatan Politik","Majlis Perundangan Persekutuan"], ans:0,
+       hint:"Majlis ini berkaitan agama di peringkat negeri.",
+       fact:"Jepun membentuk Majlis Agama Negeri dan mengadakan persidangan agama Islam di Singapura dan Kuala Kangsar."},
+      {e:"🗃️", l:"Fail Layanan", type:"classify",
+       q:"Kelaskan layanan Jepun terhadap penduduk.",
+       groups:["Baik / dibantu","Kejam"],
+       items:[["Orang Melayu",0],["Peribumi lain yang bekerjasama dengan Jepun",0],["Orang India (dibantu menubuhkan Tentera Kebangsaan India)",0],["Orang Cina",1]],
+       hint:"Layanan kejam berpunca daripada Perang China-Jepun.",
+       fact:"Jepun memberi layanan baik kepada orang Melayu dan peribumi yang bekerjasama, membantu orang India, tetapi kejam terhadap orang Cina."},
+      {e:"🎖️", l:"Panji Tentera", type:"mcq",
+       q:"Tentera Kebangsaan India di Tanah Melayu dan Borneo Utara ditubuhkan di bawah pimpinan…",
+       opts:["Subhas Chandra Bose","Vladimir Lenin","Mustafa Kemal Ataturk","Benito Mussolini"], ans:0,
+       hint:"Pemimpin berbangsa India.",
+       fact:"Jepun membantu orang India menubuhkan Tentera Kebangsaan India di bawah pimpinan Subhas Chandra Bose."},
+      {e:"📰", l:"Laporan Sejarah", type:"mcq",
+       q:"Mengapakah orang Cina menerima layanan kejam daripada Jepun?",
+       opts:["Lanjutan permusuhan daripada Perang China-Jepun","Mereka menyokong Kuasa Paksi","Mereka enggan menggunakan wang pokok pisang","Mereka menubuhkan Tentera Kebangsaan India"], ans:0,
+       hint:"Berpunca daripada peperangan antara dua negara.",
+       fact:"Orang Cina menerima layanan kejam lanjutan permusuhan daripada Perang China-Jepun dan mengalami kesengsaraan."}
+    ]},
+  { ic:"🌴", nama:"Kem Gerila", sub:"3.7 Perjuangan Rakyat Menentang Pendudukan Jepun",
+    story:"Anda tersesat di sebuah kem rahsia di dalam hutan. Pejuang-pejuang meninggalkan mesej berkod. Fahami perjuangan rakyat menentang Jepun untuk keluar dengan selamat!",
+    word:"GERILA", clue:"MPAJA dilatih untuk mensabotaj dan melakukan perang ______ terhadap Jepun.",
+    puzzles:[
+      {e:"🪖", l:"Topi Rejimen", type:"mcq",
+       q:"Batalion Kedua Rejimen Askar Melayu bersama pasukan tentera British menentang pendaratan tentera Jepun di…",
+       opts:["Kelantan","Pulau Pinang","Sabah","Johor"], ans:0,
+       hint:"Negeri tempat Jepun mula mendarat di Tanah Melayu.",
+       fact:"Rejimen Askar Melayu menentang pendaratan Jepun di Kelantan dan terlibat dalam pertempuran di Singapura."},
+      {e:"🛡️", l:"Fail MPAJA", type:"mcq",
+       q:"MPAJA ditubuhkan selepas…",
+       opts:["Parti Komunis Malaya bersetuju mewujudkan pasukan sukarela yang dilatih oleh British","Jepun menubuhkan Koa Kunrenjo","Parti Perikatan memenangi pilihan raya","Liga Bangsa-Bangsa gagal menangani krisis"], ans:0,
+       hint:"Pasukan sukarela yang dilatih oleh British.",
+       fact:"MPAJA ditubuhkan selepas Parti Komunis Malaya bersetuju mewujudkan pasukan sukarela yang dilatih oleh British."},
+      {e:"🏕️", l:"Peta Latihan", type:"mcq",
+       q:"Anggota MPAJA diberikan latihan untuk mensabotaj dan melakukan perang gerila di…",
+       opts:["Sekolah Latihan Khas di Singapura","Koa Kunrenjo","King's House","Kuala Kangsar"], ans:0,
+       hint:"Sebuah sekolah latihan di Singapura.",
+       fact:"MPAJA diberikan latihan di Sekolah Latihan Khas di Singapura untuk mensabotaj dan melakukan perang gerila."},
+      {e:"🔢", l:"Kod Radio", type:"code", ans:"1943",
+       q:"Kerjasama MPAJA-Force 136 menentang tentera Jepun bermula pada Disember <b>____</b>.",
+       hint:"Dua tahun selepas Jepun menyerang pada 1941.",
+       fact:"Disember 1943: kerjasama MPAJA-Force 136 melawan tentera Jepun."},
+      {e:"🎒", l:"Beg Bekalan", type:"multi",
+       q:"Pilih <b>EMPAT</b> bantuan yang diperoleh MPAJA daripada British.",
+       opts:["Ubat-ubatan","Senjata","Kewangan","Latihan ketenteraan","Kapal perang","Tanah jajahan"], ans:[0,1,2,3],
+       hint:"Bantuan yang boleh dibawa ke dalam hutan.",
+       fact:"MPAJA memperoleh ubat-ubatan, senjata, kewangan dan latihan ketenteraan daripada British."},
+      {e:"⭐", l:"Panji Bintang", type:"scramble", ans:"BINTANG SATU",
+       q:"Susun huruf! Gerila Cina menubuhkan Tentera … dan bekerjasama dengan MPAJA menentang Jepun.",
+       hint:"Dua perkataan: 7 huruf dan 4 huruf.",
+       fact:"Gerila Cina menubuhkan Tentera Bintang Satu dan bekerjasama dengan MPAJA (kerjasama Parti Kuomintang dan MPAJA)."}
+    ]}
+  ]
+},
+/* ============================== BAB 8 ============================== */
+{ id:"b8", no:"BAB 8", nama:"Pilihan Raya", tema:"Misi Peti Undi 1955", ic:"🗳️", acc:"#3d9aa6", acc2:"#1f3d5a",
+  desc:"Perkembangan pilihan raya, Pilihan Raya Umum pertama 1955, Majlis Perundangan Persekutuan dan Kabinet Pertama.",
+  mix:{ word:"SARAWAK", clue:"Pada tahun 1956, pilihan raya tempatan pertama di negeri ini ialah Kuching Municipal Council." },
+  rooms:[
+  { ic:"🏙️", nama:"Dewan Perbandaran", sub:"8.1 Perkembangan Pilihan Raya di Persekutuan Tanah Melayu",
+    story:"Anda terkunci di dewan majlis perbandaran pada tahun 1950-an. Peti undi pertama disimpan di sini. Fahami perkembangan pilihan raya untuk keluar!",
+    word:"GEORGE", clue:"Pilihan raya perbandaran pada tahun 1951 diadakan di ______ Town, Pulau Pinang.",
+    puzzles:[
+      {e:"🗳️", l:"Peti Undi Kosong", type:"multi",
+       q:"Pilih <b>DUA</b> kepentingan pilihan raya.",
+       opts:["Asas berkerajaan sendiri","Peluang kepada rakyat memilih wakil atau parti yang akan membentuk kerajaan","Menguatkan kuasa Pesuruhjaya Tinggi British","Memansuhkan Raja-raja Melayu"], ans:[0,1],
+       hint:"Pilihan raya memberi kuasa kepada rakyat.",
+       fact:"Pilihan raya ialah asas berkerajaan sendiri dan peluang kepada rakyat memilih wakil atau parti yang akan membentuk kerajaan."},
+      {e:"🪜", l:"Tangga Pilihan Raya", type:"order",
+       q:"Susun perkembangan pilihan raya mengikut urutan yang betul.",
+       items:["Pilihan raya peringkat majlis perbandaran","Pilihan raya peringkat negeri","Pilihan Raya Majlis Perundangan Persekutuan 1955"],
+       hint:"Bermula dari peringkat paling kecil.",
+       fact:"Majlis perbandaran → negeri → Majlis Perundangan Persekutuan 1955."},
+      {e:"📜", l:"Dokumen Asas", type:"mcq",
+       q:"Pilihan raya diadakan selaras dengan peruntukan dalam…",
+       opts:["Perjanjian Persekutuan Tanah Melayu 1948","Perjanjian Versailles","Hukum Kanun Melaka","Deklarasi 14 Perkara"], ans:0,
+       hint:"Perjanjian ini berkaitan Persekutuan Tanah Melayu.",
+       fact:"Pilihan raya diadakan selaras dengan peruntukan dalam Perjanjian Persekutuan Tanah Melayu 1948."},
+      {e:"📘", l:"Ordinan 1950", type:"mcq",
+       q:"Ordinan Pilihan Raya Pihak Berkuasa Tempatan yang diwujudkan pada tahun 1950…",
+       opts:["memberikan kuasa kepada majlis tempatan untuk mengadakan pilihan raya","membentuk Kerajaan Persekutuan","melantik Ketua Menteri","memansuhkan Sistem Ahli"], ans:0,
+       hint:"Berkaitan pihak berkuasa tempatan.",
+       fact:"Ordinan Pilihan Raya Pihak Berkuasa Tempatan 1950 memberikan kuasa kepada majlis tempatan untuk mengadakan pilihan raya."},
+      {e:"🗃️", l:"Fail Perbandaran", type:"classify",
+       q:"Kelaskan perkara berikut mengikut pilihan raya perbandaran yang betul.",
+       groups:["George Town 1951","Kuala Lumpur 1952"],
+       items:[["Memilih sembilan orang ahli Pesuruhjaya Perbandaran",0],["Ahli sebelum ini dilantik oleh Gabenor Negeri-negeri Selat",0],["Merebut 12 kerusi Majlis Perbandaran",1],["Kawasan Sentul, Bangsar, Imbi dan Petaling Jaya",1],["UMNO bahagian Kuala Lumpur dan MCA bahagian Selangor bergabung sebagai Perikatan",1]],
+       hint:"Perikatan lahir di Kuala Lumpur.",
+       fact:"George Town (1951): 9 ahli Pesuruhjaya Perbandaran. Kuala Lumpur (Februari 1952): 12 kerusi; UMNO-MCA bergabung sebagai Perikatan."},
+      {e:"🔢", l:"Papan Kerusi", type:"code", ans:"226",
+       q:"Dalam pilihan raya peringkat negeri 1954, Perikatan UMNO-MCA menang <b>___</b> kerusi daripada 268 kerusi.",
+       hint:"Tiga digit, bermula dengan 2.",
+       fact:"Pilihan raya peringkat negeri 1954: Perikatan UMNO-MCA menang 226 daripada 268 kerusi."}
+    ]},
+  { ic:"🎩", nama:"Bilik Rundingan London", sub:"8.2 Rundingan Sebelum Pilihan Raya Umum",
+    story:"Anda terperangkap di bilik rundingan di London pada tahun 1954. Perjuangan menentukan anggota Majlis Perundangan Persekutuan direkodkan di sini. Buka setiap kunci!",
+    word:"LONDON", clue:"Tunku Abdul Rahman dan rombongan berangkat ke ______ untuk menyatakan hasrat menentukan tiga perlima anggota MPP.",
+    puzzles:[
+      {e:"👥", l:"Senarai Ahli", type:"code", ans:"46",
+       q:"Jawatankuasa Pilihan Raya dibentuk pada 1 Februari 1954 dengan <b>__</b> orang ahli.",
+       hint:"Dua digit, antara 40 dan 50.",
+       fact:"1 Februari 1954: Jawatankuasa Pilihan Raya dibentuk dengan 46 orang ahli."},
+      {e:"📋", l:"Tugasan Jawatankuasa", type:"multi",
+       q:"Pilih <b>DUA</b> tugas Jawatankuasa Pilihan Raya.",
+       opts:["Mengkaji hal ehwal pilihan raya yang akan dijalankan","Mengeluarkan dua bentuk penyata susunan MPP","Membentuk 52 kawasan pilihan raya","Mendaftarkan pengundi"], ans:[0,1],
+       hint:"Kawasan pilihan raya dibentuk oleh Suruhanjaya Penentuan Sempadan Kawasan.",
+       fact:"Jawatankuasa Pilihan Raya mengkaji hal ehwal pilihan raya dan mengeluarkan dua bentuk penyata susunan MPP."},
+      {e:"✈️", l:"Tiket ke London", type:"multi",
+       q:"Pilih <b>TIGA</b> tokoh yang berangkat bersama Tunku Abdul Rahman ke London pada 21 April 1954.",
+       opts:["Tan Cheng Lock","T.H. Tan","Dato' Abdul Razak Hussein","Oliver Lyttelton","Sir Donald MacGillivray","Ong Kee Hui"], ans:[0,1,2],
+       hint:"Oliver Lyttelton ialah pegawai British di London.",
+       fact:"21 April 1954: Tunku Abdul Rahman bersama Tan Cheng Lock, T.H. Tan dan Dato' Abdul Razak Hussein berangkat ke London."},
+      {e:"🎩", l:"Kad Nama", type:"mcq",
+       q:"Pada 14 Mei 1954, Tunku Abdul Rahman berunding dengan Setiausaha Tanah Jajahan British, iaitu…",
+       opts:["Oliver Lyttelton","Sir Donald MacGillivray","Woodrow Wilson","William Tan"], ans:0,
+       hint:"Namanya bermula dengan huruf O.",
+       fact:"14 Mei 1954: Tunku Abdul Rahman berunding dengan Oliver Lyttelton, Setiausaha Tanah Jajahan British di London."},
+      {e:"📄", l:"Minit Mesyuarat", type:"mcq",
+       q:"Apakah keputusan rundingan dengan Oliver Lyttelton pada 14 Mei 1954?",
+       opts:["Gagal menjayakan hasrat Tunku mendapatkan tiga perlima ahli melalui pilihan raya","Semua ahli MPP dipilih melalui pilihan raya","Tunku dilantik sebagai Ketua Menteri","Pilihan raya dibatalkan"], ans:0,
+       hint:"Rundingan ini tidak mencapai matlamatnya.",
+       fact:"Rundingan 14 Mei 1954 gagal menjayakan hasrat Tunku Abdul Rahman mendapatkan tiga perlima ahli melalui pilihan raya."},
+      {e:"🗓️", l:"Kalendar 1954", type:"order",
+       q:"Susun peristiwa rundingan sebelum Pilihan Raya Umum mengikut urutan yang betul.",
+       items:["Jawatankuasa Pilihan Raya dibentuk","Tunku Abdul Rahman dan rombongan berangkat ke London","Rundingan dengan Oliver Lyttelton","Persetujuan 52 orang ahli MPP dipilih melalui pilihan raya","Rang Undang-Undang Pilihan Raya Persekutuan Tanah Melayu diluluskan"],
+       hint:"Rundingan yang gagal berlaku sebelum persetujuan dicapai.",
+       fact:"1 Feb 1954 → 21 April 1954 → 14 Mei 1954 → awal Julai 1954 (52 ahli) → 18–19 Ogos 1954 (rang undang-undang diluluskan)."}
+    ]},
+  { ic:"🗳️", nama:"Pusat Mengundi 1955", sub:"8.2 Proses Pilihan Raya Majlis Perundangan Persekutuan 1955",
+    story:"Hari mengundi semakin hampir! Anda terkunci di pusat mengundi. Fahami proses dan syarat pilihan raya 1955 untuk membuka setiap peti undi.",
+    word:"KEMPEN", clue:"______ pilihan raya diadakan selama 45 hari.",
+    puzzles:[
+      {e:"🗓️", l:"Jadual Pilihan Raya", type:"order",
+       q:"Susun proses Pilihan Raya Majlis Perundangan Persekutuan 1955 mengikut urutan.",
+       items:["Penubuhan Suruhanjaya Penentuan Sempadan Kawasan","Pendaftaran pengundi","Penamaan calon","Kempen pilihan raya","Mengundi","Pengumuman keputusan"],
+       hint:"Kawasan perlu ditentukan sebelum pengundi didaftarkan.",
+       fact:"26 April 1954 Suruhanjaya → Ogos 1954 rang undang-undang → 18 Okt 1954 pendaftaran → 15 Jun 1955 penamaan calon → kempen 45 hari → 27 Julai 1955 mengundi → pengiraan → keputusan."},
+      {e:"⏱️", l:"Jam Kempen", type:"code", ans:"45",
+       q:"Kempen pilihan raya diadakan selama <b>__</b> hari.",
+       hint:"Lebih sebulan, kurang dua bulan.",
+       fact:"Kempen pilihan raya diadakan selama 45 hari."},
+      {e:"🪪", l:"Kad Pengundi", type:"multi",
+       q:"Pilih <b>TIGA</b> syarat untuk menjadi <b>pengundi</b>.",
+       opts:["Warganegara Persekutuan Tanah Melayu","Berumur 21 tahun ke atas","Tinggal di Persekutuan Tanah Melayu dalam tempoh enam bulan terdahulu","Berpengetahuan dalam bahasa Inggeris dan bahasa Melayu","Berumur 18 tahun ke atas","Tinggal 12 bulan sebelum hari penamaan calon"], ans:[0,1,2],
+       hint:"Syarat bahasa dan 12 bulan ialah syarat calon.",
+       fact:"Syarat pengundi: warganegara PTM, berumur 21 tahun ke atas dan tinggal di PTM dalam tempoh enam bulan terdahulu."},
+      {e:"📢", l:"Borang Calon", type:"mcq",
+       q:"Syarat yang dikenakan kepada <b>calon</b> tetapi <strong>TIDAK</strong> kepada pengundi ialah…",
+       opts:["Berpengetahuan dalam bahasa Inggeris dan bahasa Melayu","Warganegara Persekutuan Tanah Melayu","Berumur 21 tahun ke atas","Tinggal di Persekutuan Tanah Melayu"], ans:0,
+       hint:"Calon perlu berkomunikasi dalam dua bahasa.",
+       fact:"Syarat calon: warganegara PTM, 21 tahun ke atas, tinggal di PTM 12 bulan sebelum hari penamaan calon dan berpengetahuan bahasa Inggeris dan bahasa Melayu."},
+      {e:"🗺️", l:"Peta Sempadan", type:"mcq",
+       q:"Suruhanjaya Penentuan Sempadan Kawasan (26 April 1954) berjaya membentuk … kawasan pilihan raya.",
+       opts:["52","46","77","100"], ans:0,
+       hint:"Sama dengan bilangan ahli MPP yang dipilih melalui pilihan raya.",
+       fact:"Suruhanjaya Penentuan Sempadan Kawasan berjaya membentuk 52 kawasan pilihan raya."},
+      {e:"📝", l:"Buku Daftar", type:"mcq",
+       q:"Pendaftaran pengundi bermula 18 Oktober 1954 di seluruh Tanah Melayu kecuali di Terengganu yang bermula pada…",
+       opts:["29 Oktober 1954","15 Jun 1955","27 Julai 1955","26 April 1954"], ans:0,
+       hint:"Masih dalam bulan Oktober 1954.",
+       fact:"Pendaftaran pengundi bermula 18 Oktober 1954, kecuali Terengganu (29 Oktober 1954)."}
+    ]},
+  { ic:"🏝️", nama:"Pejabat Pilihan Raya Borneo", sub:"8.2 Pilihan Raya Awal di Sarawak dan Sabah",
+    story:"Anda terbang ke Borneo dan terkunci di pejabat pilihan raya tempatan. Rekod pilihan raya awal Sarawak dan Sabah disimpan di sini. Buka setiap kunci!",
+    word:"KUCHING", clue:"Pilihan raya tempatan pertama di Sarawak (1956) ialah ______ Municipal Council.",
+    puzzles:[
+      {e:"🏛️", l:"Majlis Pertama", type:"mcq",
+       q:"Pilihan raya tempatan pertama di Sarawak pada tahun 1956 ialah…",
+       opts:["Kuching Municipal Council (KMC)","Sibu Urban District Council (SUDC)","Majlis Perbandaran Kuala Lumpur","Pesuruhjaya Perbandaran George Town"], ans:0,
+       hint:"Diadakan di ibu negeri Sarawak.",
+       fact:"1956: pilihan raya tempatan pertama Sarawak ialah Kuching Municipal Council (KMC), dibahagikan kepada sembilan kawasan."},
+      {e:"🗃️", l:"Fail Pengerusi", type:"classify",
+       q:"Kelaskan tokoh berikut mengikut majlis yang betul.",
+       groups:["KMC 1956","SUDC 1957"],
+       groupsFull:["Kuching Municipal Council","Sibu Urban District Council"],
+       items:[["William Tan (Pengerusi)",0],["Ong Kee Hui (Timbalan)",0],["Ting Chew Huat (Pengerusi)",1],["John Loo Ling Chong (Timbalan Pengerusi)",1]],
+       hint:"KMC lebih awal; William Tan ialah pengerusi pertamanya.",
+       fact:"KMC: William Tan (Pengerusi pertama), Ong Kee Hui (timbalan). SUDC 1957: Ting Chew Huat (Pengerusi), John Loo Ling Chong (Timbalan)."},
+      {e:"📅", l:"Kalendar Sabah", type:"mcq",
+       q:"Pilihan raya tempatan pertama di Sabah diadakan pada…",
+       opts:["16 Disember 1962","27 Julai 1955","1956","1957"], ans:0,
+       hint:"Paling lewat antara pilihan raya awal ini.",
+       fact:"16 Disember 1962: pilihan raya tempatan pertama di Sabah."},
+      {e:"📘", l:"Buku Ordinan", type:"mcq",
+       q:"Pilihan raya tempatan pertama di Sabah diadakan di bawah…",
+       opts:["Local Government Elections Ordinance","Ordinan Pilihan Raya Pihak Berkuasa Tempatan 1950","Ordinan Kawalan Barangan dan Bahan Penting","Rang Undang-Undang Pilihan Raya Persekutuan"], ans:0,
+       hint:"Nama ordinan dalam bahasa Inggeris.",
+       fact:"Pilihan raya di Sabah diadakan di bawah Local Government Elections Ordinance untuk 137 kawasan (ward)."},
+      {e:"🔢", l:"Peta Ward", type:"code", ans:"137",
+       q:"Bilangan kawasan (ward) dalam pilihan raya tempatan pertama di Sabah ialah <b>___</b>.",
+       hint:"Tiga digit, bermula dengan 1.",
+       fact:"Local Government Elections Ordinance meliputi 137 kawasan (ward) di pihak berkuasa tempatan."},
+      {e:"🎖️", l:"Lencana Penguasa", type:"mcq",
+       q:"Siapakah yang bertanggungjawab menjalankan pilihan raya tempatan di Sabah?",
+       opts:["Setiausaha Kolonial Kerajaan Tempatan selaku Penguasa Pilihan Raya","Pesuruhjaya Tinggi British","Ketua Menteri Persekutuan Tanah Melayu","Suruhanjaya Penentuan Sempadan Kawasan"], ans:0,
+       hint:"Beliau bertindak sebagai 'Penguasa Pilihan Raya'.",
+       fact:"Setiausaha Kolonial Kerajaan Tempatan selaku Penguasa Pilihan Raya bertanggungjawab menjalankan pilihan raya tersebut."},
+      {e:"🗳️", l:"Papan Keputusan", type:"fill",
+       text:"Seramai {0} calon bertanding bagi 137 kawasan, dan calon di {1} kawasan menang tanpa bertanding.",
+       bank:["202","53","137","46","52"], ans:["202","53"],
+       hint:"Bilangan calon melebihi 200.",
+       fact:"Seramai 202 calon bertanding bagi 137 kawasan dan calon di 53 kawasan menang tanpa bertanding."}
+    ]},
+  { ic:"🏢", nama:"Dewan Majlis Perundangan", sub:"8.3 Penubuhan Majlis Perundangan Persekutuan",
+    story:"Keputusan pilihan raya telah diumumkan! Anda terkunci di Dewan Majlis Perundangan Persekutuan. Fahami penubuhannya dan kesannya untuk keluar.",
+    word:"RAKYAT", clue:"Kuasa pegawai British beransur-ansur dipindahkan kepada ______ tempatan.",
+    puzzles:[
+      {e:"🏆", l:"Piala Kemenangan", type:"mcq",
+       q:"Parti Perikatan membentuk Kerajaan Persekutuan lantaran…",
+       opts:["kemenangan besar dalam Pilihan Raya Persekutuan Tanah Melayu 1955","perlantikan oleh Pesuruhjaya Tinggi British","persetujuan dengan Jepun","penubuhan Liga Bangsa-Bangsa"], ans:0,
+       hint:"Hasil undian rakyat.",
+       fact:"Parti Perikatan membentuk Kerajaan Persekutuan lantaran kemenangan besar dalam Pilihan Raya Persekutuan Tanah Melayu 1955."},
+      {e:"🎖️", l:"Surat Lantikan", type:"mcq",
+       q:"Tunku Abdul Rahman dilantik sebagai…",
+       opts:["Ketua Menteri Persekutuan Tanah Melayu yang pertama","Pesuruhjaya Tinggi British","Setiausaha Tanah Jajahan British","Pengerusi Kuching Municipal Council"], ans:0,
+       hint:"Jawatan 'Ketua'.",
+       fact:"Tunku Abdul Rahman dilantik sebagai Ketua Menteri Persekutuan Tanah Melayu yang pertama."},
+      {e:"🪑", l:"Kerusi Dewan", type:"fill",
+       text:"Keanggotaan MPP mengalami perubahan daripada {0} ahli kepada {1} ahli.",
+       bank:["77","100","52","46","137"], ans:["77","100"],
+       hint:"Bilangan ahli bertambah menjadi nombor bulat.",
+       fact:"MPP berperanan menggubal undang-undang pentadbiran; keanggotaannya berubah daripada 77 ahli kepada 100 ahli."},
+      {e:"📜", l:"Kitab Undang-undang", type:"mcq",
+       q:"Apakah peranan Majlis Perundangan Persekutuan (MPP)?",
+       opts:["Menggubal undang-undang pentadbiran pada peringkat Persekutuan Tanah Melayu","Mengutip cukai di pelabuhan","Mendaftarkan pengundi","Menjalankan pilihan raya tempatan di Sabah"], ans:0,
+       hint:"Kata kuncinya 'perundangan'.",
+       fact:"MPP berperanan menggubal undang-undang pentadbiran pada peringkat Persekutuan Tanah Melayu."},
+      {e:"🔄", l:"Fail Peralihan", type:"multi",
+       q:"Pilih <b>TIGA</b> kesan penubuhan Majlis Perundangan Persekutuan.",
+       opts:["Tunku Abdul Rahman mengambil alih tugas pentadbiran daripada Pesuruhjaya Tinggi British","Sistem Ahli dimansuhkan","Proses pertukaran dan pembaharuan berlaku secara berperingkat","Kuasa Veto Pesuruhjaya Tinggi diperkukuh","Semua pegawai tempatan digantikan dengan pegawai British"], ans:[0,1,2],
+       hint:"Kesannya mengurangkan kuasa British.",
+       fact:"Kesan penubuhan MPP: Tunku mengambil alih pentadbiran, pembaharuan berperingkat, kuasa British dipindahkan kepada rakyat tempatan, Sistem Ahli dimansuhkan."},
+      {e:"🧩", l:"Sistem Lama", type:"scramble", ans:"AHLI",
+       q:"Susun huruf! Selepas penubuhan MPP, kuasa pegawai British dipindahkan kepada rakyat tempatan dan Sistem … dimansuhkan.",
+       hint:"Empat huruf.",
+       fact:"Sistem Ahli dimansuhkan dan Kerajaan Persekutuan dibentuk serta dipimpin oleh rakyat tempatan yang dipilih oleh rakyat."}
+    ]},
+  { ic:"🪑", nama:"Bilik Mesyuarat Kabinet", sub:"8.4 Peranan Kabinet Pertama Persekutuan Tanah Melayu",
+    story:"Mesyuarat kabinet pertama akan bermula! Anda terkunci di bilik mesyuarat. Kenali anggota dan peranan kabinet pertama untuk meloloskan diri.",
+    word:"KABINET", clue:"Tunku Abdul Rahman berkuasa menubuhkan ______ sendiri bagi melancarkan pentadbiran negara.",
+    puzzles:[
+      {e:"🔢", l:"Kod Menteri", type:"code", ans:"10",
+       q:"Kabinet tahun 1955 dibarisi oleh <b>__</b> orang Menteri.",
+       hint:"Nombor bulat dua digit.",
+       fact:"Kabinet 1955 dibarisi oleh 10 orang Menteri dan dianggotai oleh tiga orang pegawai British."},
+      {e:"💼", l:"Portfolio British", type:"multi",
+       q:"Pilih <b>TIGA</b> portfolio yang dipegang oleh pegawai British dalam kabinet pertama.",
+       opts:["Setiausaha Kewangan","Setiausaha Hal Ehwal Ekonomi","Setiausaha Pertahanan","Setiausaha Tanah Jajahan","Ketua Menteri","Penguasa Pilihan Raya"], ans:[0,1,2],
+       hint:"Setiausaha Tanah Jajahan berada di London, bukan dalam kabinet.",
+       fact:"Tiga pegawai British memegang portfolio Setiausaha Kewangan, Setiausaha Hal Ehwal Ekonomi dan Setiausaha Pertahanan."},
+      {e:"📣", l:"Pengumuman Rasmi", type:"mcq",
+       q:"Pada 4 Ogos 1955, kesemua Jemaah Menteri diumumkan secara rasmi oleh…",
+       opts:["Sir Donald MacGillivray, Pesuruhjaya Tinggi British","Oliver Lyttelton, Setiausaha Tanah Jajahan","Tunku Abdul Rahman, Ketua Menteri","William Tan, Pengerusi KMC"], ans:0,
+       hint:"Beliau ialah Pesuruhjaya Tinggi British.",
+       fact:"4 Ogos 1955: Jemaah Menteri diumumkan oleh Sir Donald MacGillivray di King's House setelah diperkenankan oleh Raja-raja Melayu."},
+      {e:"🏠", l:"Alamat Majlis", type:"mcq",
+       q:"Di manakah Jemaah Menteri diumumkan secara rasmi?",
+       opts:["King's House","Sekolah Latihan Khas","Dewan Persidangan Paris","Kuala Kangsar"], ans:0,
+       hint:"Sebuah rumah rasmi.",
+       fact:"Jemaah Menteri diumumkan di King's House."},
+      {e:"👑", l:"Mohor Perkenan", type:"mcq",
+       q:"Jemaah Menteri diumumkan setelah diperkenankan oleh…",
+       opts:["Raja-raja Melayu","Ratu England","Setiausaha Tanah Jajahan British","Majlis Perundangan Persekutuan"], ans:0,
+       hint:"Pemerintah negeri-negeri Melayu.",
+       fact:"Jemaah Menteri diumumkan setelah diperkenankan oleh Raja-raja Melayu."},
+      {e:"🗂️", l:"Agenda Mesyuarat", type:"multi",
+       q:"Pilih <b>TIGA</b> peranan kabinet pertama.",
+       opts:["Membincangkan soal kewangan dan keperluan orang tempatan dalam perkhidmatan awam","Mengurangkan kuasa pentadbiran British","Meminta Kuasa Veto Pesuruhjaya Tinggi dibatalkan","Mengukuhkan kuasa Pesuruhjaya Tinggi","Menyerahkan isu pertahanan sepenuhnya kepada British"], ans:[0,1,2],
+       hint:"Kabinet berusaha ke arah berkerajaan sendiri.",
+       fact:"Peranan kabinet pertama: kewangan & keperluan orang tempatan, sistem Model Westminster, mengurangkan kuasa British, meminta Kuasa Veto dibatalkan, isu keselamatan dan pertahanan."},
+      {e:"🏛️", l:"Buku Model", type:"mcq",
+       q:"Kabinet pertama menyambung sistem yang diguna pakai dalam Majlis Mesyuarat Persekutuan yang berasaskan…",
+       opts:["Model Westminster","Sistem Pembesar Empat Lipatan","Deklarasi 14 Perkara","Sistem Ahli"], ans:0,
+       hint:"Model daripada sistem parlimen British.",
+       fact:"Kabinet pertama menyambung sistem dalam Majlis Mesyuarat Persekutuan yang berasaskan Model Westminster."}
+    ]}
+  ]
+}
+];
+// beri id unik kepada setiap bilik
+TOPICS.forEach(t=>t.rooms.forEach((r,i)=>{ r.id=t.id+'r'+(i+1); r.topic=t.id; }));
+
+/* ======================= MARKAH ======================= */
+const PTS = {BASE:100, WRONG:25, HINT:30, MIN:20, DOOR:150, DOOR_WRONG:30, DOOR_MIN:50};
+const timeFor = n => n*110 + 60;   // saat
+
+/* ======================= UTIL ======================= */
+const $ = s => document.querySelector(s);
+const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const shuffle = a => { a=a.slice(); for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]} return a; };
+const shuffleNot = (a, same) => { if(a.length<2) return a.slice(); let s; let k=0; do{ s=shuffle(a); k++; } while(same(s) && k<30); return s; };
+const fmt = s => { s=Math.max(0,s|0); return String(Math.floor(s/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0'); };
+const norm = s => String(s||'').trim().replace(/\s+/g,' ');
+const LS = {get(k,d){try{const v=localStorage.getItem(k);return v==null?d:JSON.parse(v)}catch(e){return d}}, set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
+function toast(msg){ const t=$('#toast'); t.textContent=msg; t.classList.add('on'); clearTimeout(t._h); t._h=setTimeout(()=>t.classList.remove('on'),2200); }
+function show(id){ $('#toast').classList.remove('on'); document.querySelectorAll('.screen').forEach(s=>s.classList.toggle('on', s.id===id)); window.scrollTo(0,0); }
+function openModal(id){ $(id).classList.add('on'); }
+function closeModal(id){ $(id).classList.remove('on'); }
+
+/* ======================= BUNYI ======================= */
+let AC=null, muted=LS.get('er3_mute',false);
+function beep(f,d,type='sine',v=.07,delay=0){ if(muted) return; try{ AC=AC||new (window.AudioContext||window.webkitAudioContext)(); const t=AC.currentTime+delay, o=AC.createOscillator(), g=AC.createGain(); o.type=type; o.frequency.value=f; g.gain.setValueAtTime(v,t); g.gain.exponentialRampToValueAtTime(.0001,t+d); o.connect(g); g.connect(AC.destination); o.start(t); o.stop(t+d+.03);}catch(e){} }
+const SFX = {
+  click:()=>beep(700,.04,'square',.025),
+  ok:()=>{beep(523,.12,'triangle');beep(659,.12,'triangle',.07,.1);beep(784,.28,'triangle',.07,.2)},
+  bad:()=>{beep(190,.22,'sawtooth',.045);beep(150,.25,'sawtooth',.04,.12)},
+  tick:()=>beep(1100,.03,'square',.02),
+  win:()=>{[523,659,784,1047,784,1047].forEach((f,i)=>beep(f,.22,'triangle',.07,i*.13))},
+  lose:()=>{[392,330,262,196].forEach((f,i)=>beep(f,.3,'sawtooth',.04,i*.18))}
+};
+function setMuteIcon(){ $('#muteBtn').textContent = muted?'🔇':'🔊'; }
+$('#muteBtn').onclick=()=>{ muted=!muted; LS.set('er3_mute',muted); setMuteIcon(); SFX.click(); };
+setMuteIcon();
+
+/* ======================= EJEN ======================= */
+let player = LS.get('er3_player', {nama:'',kelas:''});
+function setupAgent(){
+  if(CONFIG.SENARAI_KELAS.length){
+    $('#kelasWrap').innerHTML = '<select id="pKelas"><option value="">— Pilih —</option>'+CONFIG.SENARAI_KELAS.map(k=>`<option>${esc(k)}</option>`).join('')+'</select>';
+  }
+  $('#pNama').value = player.nama; $('#pKelas').value = player.kelas;
+  showAgent();
+  $('#saveAgent').onclick = saveAgent;
+}
+function saveAgent(){
+  const nama=norm($('#pNama').value), kelas=norm($('#pKelas').value).toUpperCase();
+  if(nama.length<2){ toast('Sila isi nama penuh anda'); $('#pNama').focus(); return false; }
+  if(!kelas){ toast('Sila isi kelas anda'); $('#pKelas').focus(); return false; }
+  player={nama,kelas}; LS.set('er3_player',player); showAgent(); SFX.click(); return true;
+}
+function showAgent(){ $('#agentSaved').textContent = player.nama ? `✔ Ejen ${player.nama} (${player.kelas}) sedia untuk misi.` : ''; }
+
+/* ======================= HOME & TOPIK ======================= */
+const MIX_STORY = "Bilik kebal arkib menyimpan rahsia seluruh bab. Kunci-kunci dipilih secara rawak daripada semua bilik dalam topik ini — hanya ejen pakar akan lolos!";
+const topicOf = id => TOPICS.find(t=>t.id===id);
+const mixMeta = t => ({id:t.id+'mix', topic:t.id, ic:"🏛️", nama:"Bilik Kebal Arkib", sub:"Cabaran Campuran "+t.no, special:true, story:MIX_STORY, word:t.mix.word, clue:t.mix.clue});
+const allRoomsOf = t => [...t.rooms, mixMeta(t)];
+function roomInfo(id){ for(const t of TOPICS){ const r=allRoomsOf(t).find(x=>x.id===id); if(r) return {...r, t}; } return null; }
+function bestOf(id){ return LS.get('ert4_best',{})[id]; }
+function setAcc(t){ const b=document.body.style; b.setProperty('--acc',t.acc); b.setProperty('--acc2',t.acc2); }
+function ensureAgent(){
+  if(!player.nama || !player.kelas){ if(!saveAgent()){ show('home'); setTimeout(()=>$('.agent').scrollIntoView({behavior:'smooth',block:'center'}),50); return false; } }
+  else { const n=norm($('#pNama').value), k=norm($('#pKelas').value).toUpperCase(); if(n && k && (n!==player.nama || k!==player.kelas)) saveAgent(); }
+  return true;
+}
+function renderHome(){
+  $('#topicGrid').innerHTML = TOPICS.map(t=>{
+    const rooms=allRoomsOf(t), kunci=t.rooms.reduce((a,r)=>a+r.puzzles.length,0), lolos=rooms.filter(r=>{const b=bestOf(r.id);return b&&b.escaped;}).length;
+    return `<button class="topic-card" data-t="${t.id}" style="--a:${t.acc};--a2:${t.acc2}">
+      <span class="big">${t.ic}</span><span class="bab">${t.no}</span>
+      <h4>${esc(t.nama)}</h4><div class="tm">${esc(t.tema)}</div><p>${esc(t.desc)}</p>
+      <div class="meta"><span class="chip">🚪 ${rooms.length} bilik</span><span class="chip">🔒 ${kunci} kunci</span><span class="chip ${lolos?'ok':''}">✔ ${lolos}/${rooms.length} lolos</span></div>
+      <div class="tprog"><i style="width:${lolos/rooms.length*100}%"></i></div></button>`;
+  }).join('');
+  document.querySelectorAll('.topic-card').forEach(c=>c.onclick=()=>{ if(!ensureAgent()) return; SFX.click(); renderTopic(c.dataset.t); });
+}
+let curTopic=null;
+function renderTopic(tid){
+  const t=topicOf(tid); curTopic=tid; setAcc(t);
+  const rooms=allRoomsOf(t), lolos=rooms.filter(r=>{const b=bestOf(r.id);return b&&b.escaped;}).length;
+  $('#topicHead').innerHTML=`<span class="big">${t.ic}</span><span class="bab">${t.no}</span><h2>${esc(t.nama)}</h2><div class="tm">${esc(t.tema)}</div><p>${esc(t.desc)}</p>
+    <div class="meta" style="display:flex;gap:6px;flex-wrap:wrap;margin-top:12px"><span class="chip">🚪 ${rooms.length} bilik</span><span class="chip ${lolos?'ok':''}">✔ ${lolos}/${rooms.length} bilik lolos</span></div>`;
+  $('#roomGrid').innerHTML = rooms.map((r,i)=>{
+    const n = r.special? r.word.length : r.puzzles.length, b=bestOf(r.id);
+    return `<button class="room-card ${r.special?'special':''}" data-r="${r.id}">
+      <span class="no">${r.special?'CABARAN AKHIR':'BILIK '+(i+1)}</span><span class="ic">${r.ic}</span>
+      <h4>${esc(r.nama)}</h4><p>${esc(r.sub)}</p>
+      <div class="meta"><span class="chip">🔒 ${n+1} kunci</span><span class="chip">⏱ ${Math.round(timeFor(n)/60)} min</span>
+      ${b?`<span class="chip ${b.escaped?'ok':'gold'}">${b.escaped?'✔ Lolos':'Terbaik'} · ${b.score}</span>`:''}</div></button>`;
+  }).join('');
+  document.querySelectorAll('#roomGrid .room-card').forEach(c=>c.onclick=()=>{ if(!ensureAgent()) return; SFX.click(); intro(tid, c.dataset.r); });
+  show('topic');
+}
+$('#topicBack').onclick=()=>{ renderHome(); show('home'); };
+$('#topicBoard').onclick=()=>openBoard(curTopic);
+
+/* ======================= PERMAINAN ======================= */
+let G=null, timerH=null;
+function buildRoom(tid, id){
+  const t=topicOf(tid);
+  if(!id.endsWith('mix')){ const r=t.rooms.find(x=>x.id===id); return {...r, puzzles:r.puzzles.map(p=>({...p}))}; }
+  // campuran: kunci rawak, setiap satu daripada bilik berlainan
+  const m=mixMeta(t), n=m.word.length, picks=[];
+  shuffle(t.rooms).forEach(r=>{ if(picks.length<n) picks.push(shuffle(r.puzzles)[0]); });
+  const rest=shuffle(t.rooms.flatMap(r=>r.puzzles).filter(p=>!picks.includes(p)));
+  while(picks.length<n) picks.push(rest.pop());
+  return {...m, puzzles:shuffle(picks).map(p=>({...p}))};
+}
+function intro(tid, id){
+  const r=buildRoom(tid, id), n=r.puzzles.length;
+  setAcc(topicOf(tid));
+  $('#infoSheet').innerHTML = `<div class="sheet-h">📨 TELEGRAM MISI · ${topicOf(tid).no} <button class="x" onclick="closeModal('#mInfo')">✕</button></div>
+  <div class="sheet-b"><div class="p-title"><span class="e">${r.ic}</span><div><small>${esc(r.sub)}</small><b>${esc(r.nama)}</b></div></div>
+  <p class="q" style="font-family:var(--type)">${esc(r.story)}</p>
+  <table class="score-table">
+    <tr><td>🔒 Kunci objek</td><td>${n} × ${PTS.BASE}</td></tr>
+    <tr><td>🚪 Pintu keluar (susun huruf rahsia)</td><td>${PTS.DOOR}</td></tr>
+    <tr><td>❌ Setiap jawapan salah</td><td>−${PTS.WRONG}</td></tr>
+    <tr><td>💡 Guna petunjuk</td><td>−${PTS.HINT}</td></tr>
+    <tr><td>⏱ Bonus baki masa</td><td>1 / 3 saat</td></tr>
+  </table>
+  <div class="actions"><button class="btn btn-ink" id="goBtn">▶ Mulakan Misi (${Math.round(timeFor(n)/60)} minit)</button></div></div>`;
+  openModal('#mInfo');
+  $('#goBtn').onclick=()=>{ closeModal('#mInfo'); start(r); };
+}
+function start(r){
+  G={room:r, solved:r.puzzles.map(()=>false), pts:r.puzzles.map(()=>0), wrong:r.puzzles.map(()=>0), hint:r.puzzles.map(()=>false),
+     total:timeFor(r.puzzles.length), left:timeFor(r.puzzles.length), doorWrong:0, doorPick:[], doorTiles:null, over:false, t0:Date.now()};
+  $('#hudName').textContent=r.ic+' '+r.nama; $('#hudSub').textContent=player.nama+' · '+player.kelas;
+  $('#roomStory').textContent=r.story;
+  renderRoom(); show('room'); tickUI();
+  clearInterval(timerH);
+  timerH=setInterval(()=>{ if(G.over) return; G.left--; tickUI(); if(G.left<=10 && G.left>0) SFX.tick(); if(G.left<=0) finish(false); },1000);
+}
+function score(){ return G.pts.reduce((a,b)=>a+b,0); }
+function tickUI(){
+  $('#hudTime').textContent=fmt(G.left); $('#timerBox').classList.toggle('danger',G.left<=60);
+  $('#hudScore').textContent=score();
+  const done=G.solved.filter(Boolean).length; $('#hudProg').style.width=(done/G.solved.length*100)+'%';
+}
+const TYPE_LBL={mcq:'Aneka Pilihan',multi:'Pilih Berganda',code:'Kunci Kod',scramble:'Susun Huruf',fill:'Isi Tempat Kosong',classify:'Kelaskan',order:'Susun Urutan',match:'Padankan'};
+function renderRoom(){
+  const r=G.room;
+  $('#objGrid').innerHTML = r.puzzles.map((p,i)=>`<button class="obj ${G.solved[i]?'done':''}" data-i="${i}">
+     <span class="e">${p.e}</span><span class="l">${esc(p.l)}</span><span class="typ">${TYPE_LBL[p.type]}</span>
+     <span class="lk">${G.solved[i]?'🔓':'🔒'}</span>${G.solved[i]?`<span class="letter">${r.word[i]}</span>`:''}</button>`).join('');
+  document.querySelectorAll('.obj').forEach(o=>o.onclick=()=>{ SFX.click(); openPuzzle(+o.dataset.i); });
+  renderDoor();
+}
+function renderDoor(){
+  const r=G.room, all=G.solved.every(Boolean), d=$('#door');
+  d.classList.toggle('ready',all);
+  if(!all){
+    d.innerHTML=`<h3>🚪 PINTU KELUAR BERKUNCI</h3><div class="clue">Kumpul semua huruf rahsia daripada setiap objek untuk membuka pintu ini.</div>
+      <div class="slots">${r.word.split('').map((c,i)=>`<div class="slot ${G.solved[i]?'filled':''}">${G.solved[i]?'?':''}</div>`).join('')}</div>
+      <div class="clue" style="font-size:12.5px;color:var(--mute)">${G.solved.filter(Boolean).length} / ${r.word.length} huruf dikumpul</div>`;
+    return;
+  }
+  if(!G.doorTiles) G.doorTiles = shuffleNot(r.word.split('').map((c,i)=>({c,i})), s=>s.map(x=>x.c).join('')===r.word);
+  d.innerHTML=`<h3>🚪 PINTU KELUAR — SUSUN HURUF RAHSIA</h3><div class="clue">“${esc(r.clue)}”</div>
+    <div class="slots" id="dSlots"></div><div class="tiles" id="dTiles"></div>
+    <div class="actions" style="justify-content:center"><button class="btn btn-ghost" id="dClr">↺ Padam</button><button class="btn btn-brass" id="dGo">🔑 Buka Pintu</button></div><div class="fb" id="dFb"></div>`;
+  const draw=()=>{
+    $('#dSlots').innerHTML = r.word.split('').map((c,k)=>{const t=G.doorPick[k]; return `<button class="slot ${t!=null?'filled':''}" data-k="${k}">${t!=null?G.doorTiles[t].c:''}</button>`}).join('');
+    $('#dTiles').innerHTML = G.doorTiles.map((t,k)=>`<button class="tile ${G.doorPick.includes(k)?'used':''}" data-k="${k}">${t.c}</button>`).join('');
+    document.querySelectorAll('#dTiles .tile').forEach(b=>b.onclick=()=>{ if(G.doorPick.length<r.word.length){G.doorPick.push(+b.dataset.k); SFX.click(); draw();} });
+    document.querySelectorAll('#dSlots .slot').forEach(b=>b.onclick=()=>{ const k=+b.dataset.k; if(G.doorPick[k]!=null){ G.doorPick.splice(k,1); draw(); } });
+  };
+  draw();
+  $('#dClr').onclick=()=>{G.doorPick=[];draw();};
+  $('#dGo').onclick=()=>{
+    if(G.doorPick.length<r.word.length){ toast('Lengkapkan semua huruf dahulu'); return; }
+    const w=G.doorPick.map(k=>G.doorTiles[k].c).join('');
+    if(w===r.word){ finish(true); }
+    else { G.doorWrong++; SFX.bad(); d.classList.remove('shake'); void d.offsetWidth; d.classList.add('shake');
+      $('#dFb').className='fb bad'; $('#dFb').style.color='#ff9b8f'; $('#dFb').textContent=`Kata laluan salah! (−${PTS.DOOR_WRONG}) Cuba lagi.`; G.doorPick=[]; draw(); }
+  };
+}
+
+/* ======================= KUNCI / TEKA-TEKI ======================= */
+let cur=null;
+function worth(i){ return Math.max(PTS.MIN, PTS.BASE - G.wrong[i]*PTS.WRONG - (G.hint[i]?PTS.HINT:0)); }
+function openPuzzle(i){
+  if(G.over) return;
+  const p=G.room.puzzles[i], sh=$('#pzSheet');
+  const head=`<div class="sheet-h">🔒 KUNCI ${i+1} / ${G.room.puzzles.length} · ${TYPE_LBL[p.type].toUpperCase()}<button class="x" id="pzX">✕</button></div>`;
+  if(G.solved[i]){
+    sh.innerHTML=head+`<div class="sheet-b"><div class="p-title"><span class="e">${p.e}</span><div><small>SUDAH DIBUKA</small><b>${esc(p.l)}</b></div></div>
+      <div class="reveal">Huruf rahsia: <span class="letter">${G.room.word[i]}</span></div>
+      <div class="fact"><b>FAKTA PENTING</b>${esc(p.fact)}</div><div class="actions"><button class="btn btn-ink" id="pzBack">Kembali ke bilik</button></div></div>`;
+    openModal('#mPuzzle'); $('#pzX').onclick=$('#pzBack').onclick=()=>closeModal('#mPuzzle'); return;
+  }
+  sh.innerHTML=head+`<div class="sheet-b"><div class="p-title"><span class="e">${p.e}</span><div><small>${esc(G.room.nama).toUpperCase()}</small><b>${esc(p.l)}</b></div></div>
+    <div class="worth"><span>Nilai kunci: <b id="pzWorth">${worth(i)}</b> markah</span><span>⏱ <span id="pzTime">${fmt(G.left)}</span></span></div>
+    ${p.type!=='fill'?`<div class="q">${p.q}</div>`:''}<div id="pzBody"></div>
+    <div class="hintbox ${G.hint[i]?'on':''}" id="pzHint">💡 ${esc(p.hint)}</div>
+    <div class="fb" id="pzFb"></div>
+    <div class="actions"><button class="btn btn-line" id="pzHintBtn" ${G.hint[i]?'disabled':''}>💡 Petunjuk (−${PTS.HINT})</button><button class="btn btn-ink" id="pzCheck">🔑 Buka Kunci</button></div></div>`;
+  cur={i, ui:BUILD[p.type](p, $('#pzBody'))};
+  openModal('#mPuzzle'); sh.scrollTop=0;
+  $('#pzX').onclick=()=>closeModal('#mPuzzle');
+  $('#pzHintBtn').onclick=()=>{ G.hint[i]=true; $('#pzHint').classList.add('on'); $('#pzHintBtn').disabled=true; $('#pzWorth').textContent=worth(i); SFX.click(); };
+  $('#pzCheck').onclick=()=>check(i);
+}
+function check(i){
+  const p=G.room.puzzles[i], r=cur.ui.check(), fb=$('#pzFb');
+  if(r.incomplete){ fb.className='fb bad'; fb.textContent=r.msg||'Lengkapkan jawapan dahulu.'; return; }
+  if(!r.ok){
+    G.wrong[i]++; SFX.bad(); const s=$('#pzSheet'); s.classList.remove('shake'); void s.offsetWidth; s.classList.add('shake');
+    fb.className='fb bad'; fb.textContent='✖ Kunci tidak terbuka. '+(r.msg||'')+` (Nilai kini ${worth(i)})`; $('#pzWorth').textContent=worth(i); return;
+  }
+  const g=worth(i); G.pts[i]=g; G.solved[i]=true; SFX.ok(); tickUI();
+  $('#pzSheet').innerHTML=`<div class="sheet-h">🔓 KUNCI ${i+1} DIBUKA</div><div class="sheet-b"><div class="success">
+    <div class="big-stamp">DIBUKA</div><div class="gain">+${g} markah</div>
+    <div class="reveal">Huruf rahsia: <span class="letter">${G.room.word[i]}</span></div></div>
+    <div class="fact"><b>FAKTA PENTING</b>${esc(p.fact)}</div>
+    <div class="actions"><button class="btn btn-ink" id="pzNext">Teruskan ➜</button></div></div>`;
+  $('#pzNext').onclick=()=>{ closeModal('#mPuzzle'); renderRoom(); if(G.solved.every(Boolean)){ toast('Semua kunci dibuka! Susun huruf rahsia di pintu keluar 🚪'); setTimeout(()=>$('#door').scrollIntoView({behavior:'smooth',block:'center'}),150);} };
+}
+setInterval(()=>{ const t=$('#pzTime'); if(t && G) t.textContent=fmt(G.left); },1000);
+
+const L='ABCDEFGH';
+const BUILD = {
+  mcq(p, box){
+    const order=shuffle(p.opts.map((o,k)=>k)); let sel=null;
+    box.innerHTML=`<div class="opts">${order.map((k,n)=>`<button class="opt" data-k="${k}"><span class="k">${L[n]}</span><span>${esc(p.opts[k])}</span></button>`).join('')}</div>`;
+    box.querySelectorAll('.opt').forEach(b=>b.onclick=()=>{ sel=+b.dataset.k; box.querySelectorAll('.opt').forEach(x=>x.classList.toggle('sel',x===b)); box.querySelectorAll('.opt').forEach(x=>x.classList.remove('bad')); SFX.click(); });
+    return {check(){ if(sel==null) return {incomplete:true,msg:'Pilih satu jawapan.'}; if(sel===p.ans) return {ok:true};
+      box.querySelector(`.opt[data-k="${sel}"]`).classList.add('bad'); return {ok:false}; }};
+  },
+  multi(p, box){
+    const order=shuffle(p.opts.map((o,k)=>k)), sel=new Set(), need=p.ans.length;
+    box.innerHTML=`<div class="opts">${order.map((k,n)=>`<button class="opt" data-k="${k}"><span class="k">${L[n]}</span><span>${esc(p.opts[k])}</span></button>`).join('')}</div>`;
+    box.querySelectorAll('.opt').forEach(b=>b.onclick=()=>{ const k=+b.dataset.k; if(sel.has(k)) sel.delete(k); else { if(sel.size>=need){ toast(`Pilih ${need} sahaja`); return; } sel.add(k);} b.classList.toggle('sel',sel.has(k)); box.querySelectorAll('.opt').forEach(x=>x.classList.remove('bad')); SFX.click(); });
+    return {check(){ if(sel.size<need) return {incomplete:true,msg:`Pilih ${need} jawapan.`};
+      const ok=p.ans.every(a=>sel.has(a)); if(ok) return {ok:true};
+      let right=p.ans.filter(a=>sel.has(a)).length; return {ok:false,msg:`${right}/${need} pilihan betul.`}; }};
+  },
+  code(p, box){
+    const n=p.ans.length, v=Array(n).fill(0);
+    box.innerHTML=`<div class="dials">${v.map((x,k)=>`<div class="dial"><button data-k="${k}" data-d="1">▲</button><div class="d" id="dg${k}">0</div><button data-k="${k}" data-d="-1">▼</button></div>`).join('')}</div>`;
+    box.querySelectorAll('.dial button').forEach(b=>b.onclick=()=>{ const k=+b.dataset.k; v[k]=(v[k]+ +b.dataset.d+10)%10; box.querySelector('#dg'+k).textContent=v[k]; SFX.tick(); });
+    return {check(){ return v.join('')===p.ans?{ok:true}:{ok:false,msg:'Kod salah.'}; }};
+  },
+  scramble(p, box){
+    const target=p.ans.replace(/\s/g,''), words=p.ans.split(' ');
+    const tiles=shuffleNot(target.split(''), s=>s.join('')===target); let pick=[];
+    box.innerHTML=`<div class="slots" id="scS"></div><div class="tiles" id="scT"></div><div style="text-align:center"><button class="btn btn-line" id="scC" style="min-height:40px">↺ Padam semua</button></div>`;
+    const draw=()=>{
+      let k=0, html='';
+      words.forEach((w,wi)=>{ if(wi) html+='<div class="slot gap"></div>'; for(let c=0;c<w.length;c++,k++){ const t=pick[k]; html+=`<button class="slot ${t!=null?'filled':''}" data-k="${k}">${t!=null?tiles[t]:''}</button>`; } });
+      box.querySelector('#scS').innerHTML=html;
+      box.querySelector('#scT').innerHTML=tiles.map((c,k)=>`<button class="tile ${pick.includes(k)?'used':''}" data-k="${k}">${c}</button>`).join('');
+      box.querySelectorAll('#scT .tile').forEach(b=>b.onclick=()=>{ if(pick.length<target.length){pick.push(+b.dataset.k); SFX.click(); draw();} });
+      box.querySelectorAll('#scS .slot[data-k]').forEach(b=>b.onclick=()=>{ const k=+b.dataset.k; if(pick[k]!=null){ pick.splice(k,1); draw(); } });
+    };
+    draw(); box.querySelector('#scC').onclick=()=>{pick=[];draw();};
+    return {check(){ if(pick.length<target.length) return {incomplete:true,msg:'Lengkapkan semua huruf.'};
+      return pick.map(k=>tiles[k]).join('')===target?{ok:true}:{ok:false,msg:'Ejaan belum tepat.'}; }};
+  },
+  fill(p, box){
+    const bank=shuffle(p.bank), n=p.ans.length, val=Array(n).fill(null);
+    const draw=()=>{
+      const s=esc(p.text).replace(/\{(\d)\}/g,(m,d)=>`<button class="blank" data-b="${d}">${val[d]!=null?esc(bank[val[d]]):'&nbsp;'}</button>`);
+      box.innerHTML=`<div class="fill-s">${s}</div><div class="lbl">BANK KATA — ketik untuk isi</div><div class="bank">${bank.map((w,k)=>`<button data-k="${k}" class="${val.includes(k)?'used':''}">${esc(w)}</button>`).join('')}</div>`;
+      box.querySelectorAll('.bank button').forEach(b=>b.onclick=()=>{ const e=val.indexOf(null); if(e<0) return; val[e]=+b.dataset.k; SFX.click(); draw(); });
+      box.querySelectorAll('.blank').forEach(b=>b.onclick=()=>{ val[+b.dataset.b]=null; draw(); });
+    };
+    draw();
+    return {check(){ if(val.includes(null)) return {incomplete:true,msg:'Isi semua tempat kosong.'};
+      const got=val.map(k=>bank[k]);
+      const ok = p.anyOrder ? [...got].sort().join('|')===[...p.ans].sort().join('|') : got.join('|')===p.ans.join('|');
+      if(ok) return {ok:true};
+      box.querySelectorAll('.blank').forEach((b,d)=>{ const good = p.anyOrder ? p.ans.includes(got[d]) : got[d]===p.ans[d]; b.classList.toggle('bad',!good); });
+      return {ok:false,msg:'Ada perkataan yang tidak tepat.'}; }};
+  },
+  classify(p, box){
+    const items=shuffle(p.items.map((it,k)=>k)), val={};
+    box.innerHTML=(p.groupsFull?`<div class="lbl">${p.groups.map((g,k)=>`<span style="color:var(--g${k})">■</span> ${esc(g)} = ${esc(p.groupsFull[k])}`).join(' &nbsp; ')}</div>`:'')+
+      `<div class="cls">${items.map(k=>`<div class="cls-item" data-k="${k}"><div class="t">${esc(p.items[k][0])}</div><div class="seg">${p.groups.map((g,gi)=>`<button data-g="${gi}" class="g${gi}">${esc(g)}</button>`).join('')}</div></div>`).join('')}</div>`;
+    box.querySelectorAll('.cls-item').forEach(row=>{ const k=+row.dataset.k;
+      row.querySelectorAll('.seg button').forEach(b=>b.onclick=()=>{ val[k]=+b.dataset.g; row.querySelectorAll('.seg button').forEach(x=>x.classList.toggle('on',x===b)); row.classList.remove('bad'); SFX.click(); }); });
+    return {check(){ if(Object.keys(val).length<p.items.length) return {incomplete:true,msg:'Kelaskan semua item.'};
+      let right=0; box.querySelectorAll('.cls-item').forEach(row=>{ const k=+row.dataset.k, ok=val[k]===p.items[k][1]; if(ok) right++; row.classList.toggle('bad',!ok); });
+      return right===p.items.length?{ok:true}:{ok:false,msg:`${right}/${p.items.length} betul.`}; }};
+  },
+  order(p, box){
+    const n=p.items.length, pool=shuffleNot(p.items.map((x,k)=>k), s=>s.every((v,k)=>v===k)); let seq=[];
+    const draw=()=>{
+      box.innerHTML=`<div class="lbl">SUSUNAN ANDA (ketik untuk keluarkan)</div><div class="ord-list">${Array.from({length:n},(x,k)=>`<button class="ord-slot ${seq[k]!=null?'filled':''}" data-k="${k}"><span class="n">${k+1}</span><span>${seq[k]!=null?esc(p.items[seq[k]]):'<i style="opacity:.5">— kosong —</i>'}</span></button>`).join('')}</div>
+        <div class="lbl">PERISTIWA (ketik ikut urutan)</div><div class="pool">${pool.map(k=>`<button data-k="${k}" class="${seq.includes(k)?'used':''}">${esc(p.items[k])}</button>`).join('')}</div>`;
+      box.querySelectorAll('.pool button').forEach(b=>b.onclick=()=>{ seq.push(+b.dataset.k); SFX.click(); draw(); });
+      box.querySelectorAll('.ord-slot').forEach(b=>b.onclick=()=>{ const k=+b.dataset.k; if(seq[k]!=null){ seq.splice(k,1); draw(); } });
+    };
+    draw();
+    return {check(){ if(seq.length<n) return {incomplete:true,msg:'Susun semua peristiwa.'};
+      let right=0; box.querySelectorAll('.ord-slot').forEach((s,k)=>{ const ok=seq[k]===k; if(ok) right++; s.classList.toggle('bad',!ok); s.classList.toggle('good',ok); });
+      return right===n?{ok:true}:{ok:false,msg:`${right}/${n} kedudukan betul.`}; }};
+  },
+  match(p, box){
+    const rows=shuffle(p.pairs.map((x,k)=>k)), rights=shuffle(p.pairs.map((x,k)=>k));
+    box.innerHTML=`<div class="mt">${rows.map(k=>`<div class="mt-row" data-k="${k}"><b>${esc(p.icon||"📅")} ${esc(p.pairs[k][0])}</b><select><option value="">— pilih padanan —</option>${rights.map(j=>`<option value="${j}">${esc(p.pairs[j][1])}</option>`).join('')}</select></div>`).join('')}</div>`;
+    box.querySelectorAll('select').forEach(s=>s.onchange=()=>{ s.closest('.mt-row').classList.remove('bad'); SFX.click(); });
+    return {check(){ const rs=[...box.querySelectorAll('.mt-row')];
+      if(rs.some(r=>r.querySelector('select').value==='')) return {incomplete:true,msg:'Padankan semua tarikh.'};
+      let right=0; rs.forEach(r=>{ const ok=+r.querySelector('select').value===+r.dataset.k; if(ok) right++; r.classList.toggle('bad',!ok); });
+      return right===rs.length?{ok:true}:{ok:false,msg:`${right}/${rs.length} padanan betul.`}; }};
+  }
+};
+
+/* ======================= TAMAT ======================= */
+function finish(escaped){
+  if(G.over) return; G.over=true; clearInterval(timerH); closeModal('#mPuzzle');
+  const kunci=score(), door=escaped?Math.max(PTS.DOOR_MIN, PTS.DOOR-G.doorWrong*PTS.DOOR_WRONG):0, bonus=escaped?Math.floor(G.left/3):0;
+  const total=kunci+door+bonus, solved=G.solved.filter(Boolean).length, n=G.solved.length;
+  const hints=G.hint.filter(Boolean).length, wrongs=G.wrong.reduce((a,b)=>a+b,0)+G.doorWrong;
+  const stars = escaped ? (hints===0 && wrongs<=2 ? 3 : 2) : (solved>=n/2 ? 1 : 0);
+  const used=G.total-G.left;
+  const rec={game:CONFIG.GAME_ID, topik:topicOf(G.room.topic).no, nama:player.nama, kelas:player.kelas, bilik:G.room.id, namaBilik:G.room.nama, markah:total, masa:used, kunci:`${solved}/${n}`, lolos:escaped?'YA':'TIDAK', bintang:stars, t:new Date().toISOString()};
+  // simpan tempatan
+  const best=LS.get('ert4_best',{}); const b=best[G.room.id]; if(!b || total>b.score) best[G.room.id]={score:total,escaped:escaped||(b&&b.escaped)}; else if(escaped) b.escaped=true; LS.set('ert4_best',best);
+  const log=LS.get('ert4_log',[]); log.push(rec); LS.set('ert4_log',log.slice(-300));
+  if(escaped){ SFX.win(); confetti(); } else SFX.lose();
+  $('#endBox').innerHTML=`<div class="big-stamp ${escaped?'':'red'}" style="font-size:clamp(26px,6vw,40px);background:rgba(0,0,0,.2)">${escaped?'BERJAYA LOLOS!':'MASA TAMAT'}</div>
+    <div class="card">
+      <div style="font-family:var(--type);color:var(--ink2);letter-spacing:1px">${topicOf(G.room.topic).no} · ${G.room.ic} ${esc(G.room.nama)} · ${esc(player.nama)} (${esc(player.kelas)})</div>
+      <div class="stars">${[0,1,2].map(k=>`<span class="${k<stars?'':'off'}">⭐</span>`).join('')}</div>
+      <div class="brk">
+        <div><span>🔓 Kunci dibuka (${solved}/${n})</span><b>${kunci}</b></div>
+        <div><span>🚪 Pintu keluar</span><b>${door}</b></div>
+        <div><span>⏱ Bonus baki masa (${fmt(G.left)})</span><b>${bonus}</b></div>
+        <div><span>❌ Salah · 💡 Petunjuk</span><b>${wrongs} · ${hints}</b></div>
+        <div class="tot"><span>JUMLAH MARKAH</span><b>${total}</b></div>
+      </div>
+      <div class="sendst" id="sendSt">⏳ Menghantar markah…</div>
+      <div class="actions"><button class="btn btn-ink" id="eAgain">↻ Main Semula</button><button class="btn btn-brass" id="eBoard">🏆 Papan Markah</button><button class="btn btn-line" id="eHome">🚪 Pilih Bilik Lain</button></div>
+    </div>`;
+  show('end');
+  $('#eAgain').onclick=()=>intro(G.room.topic, G.room.id); $('#eBoard').onclick=()=>openBoard(G.room.topic, G.room.id); $('#eHome').onclick=()=>renderTopic(G.room.topic);
+  sendScore(rec).then(st=>{ const e=$('#sendSt'); if(!e) return;
+    if(st==='local'){ e.style.color='var(--ink2)'; e.textContent='💾 Markah disimpan dalam peranti ini (Google Sheet belum disambung).'; }
+    else if(st==='sent'){ e.style.color='var(--green)'; e.textContent='✔ Markah dihantar ke papan markah kelas.'; }
+    else { e.style.color='var(--red)'; e.innerHTML='⚠ Gagal menghantar (tiada internet?). Markah akan dihantar semula secara automatik kemudian.'; }
+  });
+}
+async function postRec(rec){
+  await fetch(CONFIG.SHEET_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(rec)});
+}
+async function sendScore(rec){
+  if(!CONFIG.SHEET_URL) return 'local';
+  try{ await postRec(rec); return 'sent'; }
+  catch(e){ const q=LS.get('ert4_queue',[]); q.push(rec); LS.set('ert4_queue',q); return 'fail'; }
+}
+async function flushQueue(){
+  if(!CONFIG.SHEET_URL) return; const q=LS.get('ert4_queue',[]); if(!q.length) return; const left=[];
+  for(const r of q){ try{ await postRec(r); }catch(e){ left.push(r); } }
+  LS.set('ert4_queue',left);
+}
+
+/* ======================= PAPAN MARKAH ======================= */
+let boardTab='kelas';
+function fillRoomSelect(){
+  const tid=$('#boardTopic').value, sel=$('#boardRoom');
+  if(tid==='all'){ sel.innerHTML='<option value="all">Semua bilik</option>'; sel.disabled=true; return; }
+  sel.disabled=false;
+  sel.innerHTML='<option value="all">Semua bilik '+esc(topicOf(tid).no)+'</option>'+allRoomsOf(topicOf(tid)).map(r=>`<option value="${r.id}">${r.ic} ${esc(r.nama)}</option>`).join('');
+}
+function openBoard(tid, roomId){
+  $('#boardTopic').innerHTML='<option value="all">Semua topik</option>'+TOPICS.map(t=>`<option value="${t.id}">${t.ic} ${t.no}: ${esc(t.nama)}</option>`).join('');
+  $('#boardTopic').value=tid||'all'; fillRoomSelect(); $('#boardRoom').value=roomId||'all';
+  show('board'); loadBoard();
+}
+let boardRows=null;
+async function fetchRows(){
+  if(!CONFIG.SHEET_URL) return {rows:LS.get('ert4_log',[]), local:true};
+  const u=CONFIG.SHEET_URL+(CONFIG.SHEET_URL.includes('?')?'&':'?')+'game='+encodeURIComponent(CONFIG.GAME_ID)+'&t='+Date.now();
+  try{ const r=await fetch(u); const j=await r.json(); return {rows:j.rows||[]}; }
+  catch(e){ return new Promise(res=>{ const cb='ert4cb'+Date.now(), s=document.createElement('script'); let done=false;
+    window[cb]=d=>{done=true; res({rows:(d&&d.rows)||[]}); delete window[cb]; s.remove();};
+    s.onerror=()=>{ if(!done) res({rows:LS.get('ert4_log',[]), local:true, err:true}); };
+    s.src=u+'&callback='+cb; document.body.appendChild(s);
+    setTimeout(()=>{ if(!done) res({rows:LS.get('ert4_log',[]), local:true, err:true}); },12000); }); }
+}
+async function loadBoard(){
+  $('#lb').innerHTML='<div class="empty">⏳ Memuatkan papan markah…</div>';
+  const res=await fetchRows(); boardRows=res;
+  $('#boardNote').innerHTML = res.err ? '<div class="note">⚠ Tidak dapat menghubungi Google Sheet. Memaparkan markah dalam peranti ini sahaja.</div>'
+    : res.local ? '<div class="note">💾 Mod luar talian: papan ini hanya memaparkan markah yang dimainkan dalam peranti ini. Guru boleh menyambungkan Google Sheet (lihat SHEET_URL dalam kod) untuk papan markah seluruh kelas.</div>' : '';
+  drawBoard();
+}
+function drawBoard(){
+  if(!boardRows) return;
+  const tid=$('#boardTopic').value, room=$('#boardRoom').value, sortBy=$('#boardSort').value;
+  $('#boardSort').style.display = boardTab==='kelas'?'':'none';
+  const rows=boardRows.rows.filter(r=>r && r.nama && r.bilik && (room!=='all' ? r.bilik===room : (tid==='all' || String(r.bilik).startsWith(tid))));
+  // markah terbaik setiap murid bagi setiap bilik
+  const best={};
+  rows.forEach(r=>{ const k=norm(r.nama).toUpperCase()+'|'+norm(r.kelas).toUpperCase()+'|'+r.bilik, m=+r.markah||0;
+    if(!best[k] || m>best[k].markah || (m===best[k].markah && (+r.masa||0)<best[k].masa)) best[k]={nama:norm(r.nama),kelas:norm(r.kelas).toUpperCase(),bilik:r.bilik,markah:m,masa:+r.masa||0,lolos:r.lolos}; });
+  const per={}; Object.values(best).forEach(b=>{ const k=b.nama.toUpperCase()+'|'+b.kelas; per[k]=per[k]||{nama:b.nama,kelas:b.kelas,markah:0,masa:0,bilik:0,lolos:0}; per[k].markah+=b.markah; per[k].masa+=b.masa; per[k].bilik++; if(b.lolos==='YA') per[k].lolos++; });
+  let list, html='';
+  if(boardTab==='individu'){
+    list=Object.values(per).sort((a,b)=>b.markah-a.markah||a.masa-b.masa).slice(0,50);
+    const max=list[0]?list[0].markah:1;
+    html=list.map((p,i)=>`<div class="lb-row ${i<3?'r'+(i+1):''}" style="animation-delay:${i*30}ms"><div class="rk">${['🥇','🥈','🥉'][i]||i+1}</div>
+      <div><div class="nm">${esc(p.nama)}</div><div class="sb">${esc(p.kelas)} · ${room==='all'?p.bilik+' bilik · ':''}${p.lolos?'🚪 lolos '+p.lolos:'belum lolos'} · ⏱ ${fmt(p.masa)}</div><div class="bar"><i style="width:${max?p.markah/max*100:0}%"></i></div></div>
+      <div class="sc">${p.markah}<small>markah</small></div></div>`).join('');
+  } else {
+    const kl={}; Object.values(per).forEach(p=>{ kl[p.kelas]=kl[p.kelas]||{kelas:p.kelas,jumlah:0,murid:0,lolos:0}; kl[p.kelas].jumlah+=p.markah; kl[p.kelas].murid++; kl[p.kelas].lolos+=p.lolos; });
+    list=Object.values(kl).map(k=>({...k,purata:Math.round(k.jumlah/k.murid)}));
+    list.sort((a,b)=> sortBy==='purata' ? b.purata-a.purata||b.jumlah-a.jumlah : b.jumlah-a.jumlah||b.purata-a.purata);
+    const key=sortBy==='purata'?'purata':'jumlah', max=list[0]?list[0][key]:1;
+    html=list.map((k,i)=>`<div class="lb-row ${i<3?'r'+(i+1):''}" style="animation-delay:${i*40}ms"><div class="rk">${['🥇','🥈','🥉'][i]||i+1}</div>
+      <div><div class="nm">${esc(k.kelas)}</div><div class="sb">👥 ${k.murid} murid · 🚪 ${k.lolos} kali lolos · ${sortBy==='purata'?'Jumlah '+k.jumlah:'Purata '+k.purata}</div><div class="bar"><i style="width:${max?k[key]/max*100:0}%"></i></div></div>
+      <div class="sc">${k[key]}<small>${key}</small></div></div>`).join('');
+  }
+  $('#lb').innerHTML = html || '<div class="empty">Belum ada markah. Jadilah ejen pertama! 🕵️</div>';
+}
+document.querySelectorAll('#boardTabs button').forEach(b=>b.onclick=()=>{ boardTab=b.dataset.t; document.querySelectorAll('#boardTabs button').forEach(x=>x.classList.toggle('on',x===b)); drawBoard(); });
+$('#boardTopic').onchange=()=>{ fillRoomSelect(); drawBoard(); };
+$('#boardRoom').onchange=drawBoard; $('#boardSort').onchange=drawBoard;
+$('#boardRefresh').onclick=loadBoard; $('#boardBack').onclick=()=>{ if(curTopic) renderTopic(curTopic); else { renderHome(); show('home'); } };
+$('#toBoard').onclick=()=>openBoard();
+
+/* ======================= LAIN-LAIN ======================= */
+$('#exitRoom').onclick=()=>{
+  $('#infoSheet').innerHTML=`<div class="sheet-h">⚠ KELUAR MISI</div><div class="sheet-b"><p class="q">Keluar sekarang? Kemajuan bilik ini akan hilang dan markah <b>tidak</b> direkodkan.</p>
+    <div class="actions"><button class="btn btn-line" onclick="closeModal('#mInfo')">Teruskan misi</button><button class="btn btn-ink" id="exitYes">Ya, keluar</button></div></div>`;
+  openModal('#mInfo'); $('#exitYes').onclick=()=>{ G.over=true; clearInterval(timerH); closeModal('#mInfo'); renderTopic(G.room.topic); };
+};
+$('#toHow').onclick=()=>{
+  $('#infoSheet').innerHTML=`<div class="sheet-h">📖 CARA BERMAIN <button class="x" onclick="closeModal('#mInfo')">✕</button></div><div class="sheet-b howto"><ol>
+    <li>Isi <b>Kad Pengenalan Ejen</b> (nama &amp; kelas) dan tekan Simpan.</li>
+    <li>Pilih <b>topik</b> (Bab 1, Bab 3 atau Bab 8), kemudian pilih <b>bilik</b> dalam topik itu. Setiap bilik mewakili satu subtopik.</li>
+    <li>Ketik setiap <b>objek berkunci</b> dalam bilik dan jawab cabarannya: aneka pilihan, kunci kod, susun huruf, kelaskan, susun urutan, padankan atau isi tempat kosong.</li>
+    <li>Setiap kunci yang dibuka memberikan <b>huruf rahsia</b> 🟡 dan satu fakta penting.</li>
+    <li>Selepas semua kunci dibuka, <b>susun huruf rahsia</b> di pintu keluar untuk meloloskan diri.</li>
+    <li>Jawapan salah dan petunjuk mengurangkan markah. Lolos lebih cepat = bonus masa lebih tinggi!</li>
+    <li>Markah dihantar ke <b>Papan Markah Kelas</b>. Hanya markah terbaik setiap murid bagi setiap bilik dikira.</li></ol>
+    <div class="actions"><button class="btn btn-ink" onclick="closeModal('#mInfo')">Faham!</button></div></div>`;
+  openModal('#mInfo');
+};
+
+/* confetti */
+function confetti(){
+  const c=$('#confetti'), x=c.getContext('2d'); c.width=innerWidth; c.height=innerHeight;
+  const cols=['#ecd27a','#c9a227','#3e7d4f','#b3372b','#f4ead3','#3d6b73'];
+  const P=Array.from({length:160},()=>({x:Math.random()*c.width,y:-20-Math.random()*c.height*.5,vx:(Math.random()-.5)*4,vy:2+Math.random()*4,r:4+Math.random()*6,a:Math.random()*6,va:(Math.random()-.5)*.3,c:cols[Math.random()*cols.length|0]}));
+  let f=0; (function loop(){ x.clearRect(0,0,c.width,c.height); P.forEach(p=>{p.x+=p.vx;p.y+=p.vy;p.vy+=.04;p.a+=p.va; x.save();x.translate(p.x,p.y);x.rotate(p.a);x.fillStyle=p.c;x.fillRect(-p.r/2,-p.r/4,p.r,p.r/2);x.restore();}); if(++f<240) requestAnimationFrame(loop); else x.clearRect(0,0,c.width,c.height); })();
+}
+document.querySelectorAll('.modal').forEach(m=>m.addEventListener('click',e=>{ if(e.target===m && m.id!=='mPuzzle') m.classList.remove('on'); }));
+
+setupAgent(); renderHome(); flushQueue();
+</script>
+</body>
+</html>
